@@ -27,6 +27,32 @@ fn should_panic_if_vec_length_does_not_match_expected() {
 }
 
 #[test]
+fn should_not_panic_if_vec_contains_value() {
+    let test_vec = vec![1,2,3];
+    assert_that(&test_vec).contains(&2);
+}
+
+#[test]
+#[should_panic]
+fn should_panic_if_vec_does_not_contain_value() {
+    let test_vec = vec![1,2,3];
+    assert_that(&test_vec).contains(&5);
+}
+
+#[test]
+fn should_not_panic_if_vec_contains_mapped_value() {
+    let test_vec = vec![TestStruct { value: 5  }, TestStruct { value: 6 }];
+    assert_that(&test_vec).mapped_contains(|val| &val.value, &5);
+}
+
+#[test]
+#[should_panic]
+fn should_panic_if_vec_does_not_contain_mapped_value() {
+    let test_vec = vec![TestStruct { value: 5  }, TestStruct { value: 6 }];
+    assert_that(&test_vec).mapped_contains(|val| &val.value, &1);
+}
+
+#[test]
 fn should_not_panic_if_option_is_expected_to_contain_value_and_does() {
     let option = Some("Hello");
     assert_that(&option).is_some();
@@ -104,6 +130,7 @@ fn should_be_able_to_map_to_inner_field_of_struct_when_matching() {
     assert_that(&test_struct).map(|val| &val.value).is_equal_to(&5);
 }
 
+#[derive(Debug, PartialEq)]
 struct TestStruct {
     pub value: u8,
 }
