@@ -3,13 +3,11 @@ use std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct Spec<'s, S: 's> {
-    pub subject: &'s S,
+    subject: &'s S,
 }
 
-impl<'s, S> Spec<'s, S> {
-    pub fn assert_that(subject: &'s S) -> Spec<'s, S> {
-        Spec { subject: subject }
-    }
+pub fn assert_that<'s, S>(subject: &'s S) -> Spec<'s, S> {
+    Spec { subject: subject }
 }
 
 impl<'s, S> Spec<'s, S> where S: Debug + PartialEq {
