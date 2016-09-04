@@ -1,5 +1,5 @@
 use std::cmp::PartialEq;
-use std::fmt::Display;
+use std::fmt::Debug;
 
 #[derive(Debug)]
 pub struct Spec<'s, S: 's> {
@@ -12,10 +12,10 @@ impl<'s, S> Spec<'s, S> {
     }
 }
 
-impl<'s, S> Spec<'s, S> where S: Display + PartialEq {
+impl<'s, S> Spec<'s, S> where S: Debug + PartialEq {
     pub fn is_equal_to(&self, expected: &S) {
         if !self.subject.eq(expected) {
-            panic!(format!("expected <{}> but was <{}>", expected, self.subject));
+            panic!(format!("expected <{:?}> but was <{:?}>", expected, self.subject));
         }
     }
 }
@@ -24,20 +24,20 @@ impl<'s, T> Spec<'s, Vec<T>> {
     pub fn has_length(&self, expected: usize) {
         let length = self.subject.len();
         if length != expected {
-            panic!(format!("expected vec with length of <{}> but was <{}>", expected, length));
+            panic!(format!("expected vec with length of <{:?}> but was <{:?}>", expected, length));
         }
     }
 }
 
-impl<'s, T> Spec<'s, Option<T>> where T: Display + PartialEq {
+impl<'s, T> Spec<'s, Option<T>> where T: Debug + PartialEq {
     pub fn contains_value(&self, expected_value: &T) {
         match self.subject {
             &Some(ref val) => {
                 if !val.eq(expected_value) {
-                    panic!(build_failure_string(&format!("<{}>", expected_value), &format!("<{}>", val)));
+                    panic!(build_failure_string(&format!("<{:?}>", expected_value), &format!("<{:?}>", val)));
                 }
             },
-            &None => panic!(build_failure_string(&format!("<{}>", expected_value), "empty"))
+            &None => panic!(build_failure_string(&format!("<{:?}>", expected_value), "empty"))
         };
 
         fn build_failure_string(containing: &str, actual: &str) -> String {
@@ -55,23 +55,23 @@ impl<'s, T> Spec<'s, Option<T>> where T: Display + PartialEq {
     pub fn is_none(&self) {
         match self.subject {
             &None => (),
-            &Some(ref val) => panic!(format!("expected empty option but contained <{}>", val))
+            &Some(ref val) => panic!(format!("expected empty option but contained <{:?}>", val))
         };
     }
 }
 
-impl<'s, T, E> Spec<'s, Result<T, E>> where T: Display, E: Display {
+impl<'s, T, E> Spec<'s, Result<T, E>> where T: Debug, E: Debug {
     pub fn is_ok(&self) {
         match self.subject {
             &Ok(_) => (),
-            &Err(ref err) => panic!(format!("expected ok result but was error result of <{}>", err)),
+            &Err(ref err) => panic!(format!("expected ok result but was error result of <{:?}>", err)),
         };
     }
 
     pub fn is_error(&self) {
         match self.subject {
             &Err(_) => (),
-            &Ok(ref val) => panic!(format!("expected error result but was ok result of <{}>", val)),
+            &Ok(ref val) => panic!(format!("expected error result but was ok result of <{:?}>", val)),
         };
     }
 }
