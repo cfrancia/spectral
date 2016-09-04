@@ -73,6 +73,32 @@ fn should_panic_if_option_is_not_empty_but_was_expected_as_empty() {
 }
 
 #[test]
+fn should_not_panic_if_result_is_expected_to_be_ok_and_is() {
+    let result: Result<&str, &str> = Ok("Hello");
+    Spec::assert_that(&result).is_ok();
+}
+
+#[test]
+#[should_panic]
+fn should_panic_if_result_is_expected_to_be_ok_and_is_not() {
+    let result: Result<&str, &str> = Err("Oh no");
+    Spec::assert_that(&result).is_ok();
+}
+
+#[test]
+fn should_not_panic_if_result_is_expected_to_be_error_and_is() {
+    let result: Result<&str, &str> = Err("Oh no");
+    Spec::assert_that(&result).is_error();
+}
+
+#[test]
+#[should_panic]
+fn should_panic_if_result_is_expected_to_be_error_and_is_not() {
+    let result: Result<&str, &str> = Ok("Hello");
+    Spec::assert_that(&result).is_error();
+}
+
+#[test]
 fn should_be_able_to_map_to_inner_field_of_struct_when_matching() {
     let test_struct = TestStruct { value: 5 };
     Spec::assert_that(&test_struct).map(|val| &val.value).is_equal_to(&5);
