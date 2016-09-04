@@ -125,6 +125,19 @@ fn should_panic_if_result_is_expected_to_be_error_and_is_not() {
 }
 
 #[test]
+fn should_not_panic_if_value_matches() {
+    let value = "Hello";
+    assert_that(&value).matches(|val| val.eq(&"Hello"));
+}
+
+#[test]
+#[should_panic]
+fn should_panic_if_value_does_not_match() {
+    let value = "Hello";
+    assert_that(&value).matches(|val| val.eq(&"Hi"));
+}
+
+#[test]
 fn should_be_able_to_map_to_inner_field_of_struct_when_matching() {
     let test_struct = TestStruct { value: 5 };
     assert_that(&test_struct).map(|val| &val.value).is_equal_to(&5);

@@ -114,7 +114,17 @@ impl<'s, T, E> Spec<'s, Result<T, E>>
     }
 }
 
-impl<'s, S> Spec<'s, S> {
+impl<'s, S> Spec<'s, S>
+    where S: Debug
+{
+    pub fn matches<F>(&self, matching_function: F)
+        where F: Fn(&'s S) -> bool
+    {
+        if !matching_function(self.subject) {
+            panic!(format!("assertion failed on value of <{:?}>", self.subject));
+        }
+    }
+
     pub fn map<F, T>(self, mapping_function: F) -> Spec<'s, T>
         where F: Fn(&'s S) -> &'s T
     {
