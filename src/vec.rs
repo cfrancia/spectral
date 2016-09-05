@@ -3,9 +3,7 @@ use super::Spec;
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
-impl<'s, T> Spec<'s, Vec<T>>
-    where T: Debug + PartialEq
-{
+impl<'s, T> Spec<'s, Vec<T>> {
     pub fn has_length(&self, expected: usize) {
         let length = self.subject.len();
         if length != expected {
@@ -14,7 +12,11 @@ impl<'s, T> Spec<'s, Vec<T>>
                            length));
         }
     }
+}
 
+impl<'s, T> Spec<'s, Vec<T>>
+    where T: Debug + PartialEq
+{
     pub fn contains(&self, expected_value: &T) {
         if !self.subject.contains(expected_value) {
             Self::panic_unmatched(expected_value, self.subject);
