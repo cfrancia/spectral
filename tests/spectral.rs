@@ -9,6 +9,13 @@ fn should_contain_assertion_description_in_panic() {
 }
 
 #[test]
+#[should_panic(expected = "closure: expectation failed for value <\"Hello\">")]
+fn should_contain_assertion_description_if_message_is_provided() {
+    let value = "Hello";
+    asserting(&"closure").that(&value).matches(|val| val.eq(&"Hi"));
+}
+
+#[test]
 fn should_not_panic_on_equal_subjects() {
     assert_that(&1).is_equal_to(&1);
 }

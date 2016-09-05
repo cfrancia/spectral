@@ -78,6 +78,13 @@ impl<'s, S> Spec<'s, S> {
             }
         }
     }
+
+    fn fail_with_message(self, message: String) {
+        match self.description {
+            Some(description) => panic!(format!("{}: {}", description, message)),
+            None => panic!(message),
+        }
+    }
 }
 
 impl<'s, S> Spec<'s, S>
@@ -97,11 +104,13 @@ impl<'s, S> Spec<'s, S>
 impl<'s, S> Spec<'s, S>
     where S: Debug
 {
-    pub fn matches<F>(&self, matching_function: F)
+    pub fn matches<F>(self, matching_function: F)
         where F: Fn(&'s S) -> bool
     {
-        if !matching_function(self.subject) {
-            panic!(format!("expectation failed for value <{:?}>", self.subject));
+        let subject = self.subject;
+
+        if !matching_function(subject) {
+            self.fail_with_message(format!("expectation failed for value <{:?}>", subject));
         }
     }
 
