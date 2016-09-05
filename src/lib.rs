@@ -14,12 +14,17 @@ pub fn assert_that<'s, S>(subject: &'s S) -> Spec<'s, S> {
     Spec { subject: subject }
 }
 
+fn build_expectation_string(expected: &str, actual: &str) -> String {
+    format!("expected {} but was {}", expected, actual)
+}
+
 impl<'s, S> Spec<'s, S>
     where S: Debug + PartialEq
 {
     pub fn is_equal_to(&self, expected: &S) {
         if !self.subject.eq(expected) {
-            panic!(format!("expected <{:?}> but was <{:?}>", expected, self.subject));
+            panic!(build_expectation_string(&format!("{:?}", expected),
+                                            &format!("{:?}", self.subject)));
         }
     }
 }

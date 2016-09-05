@@ -1,4 +1,4 @@
-use super::Spec;
+use super::{build_expectation_string, Spec};
 
 use std::cmp::PartialEq;
 use std::fmt::Debug;
@@ -10,31 +10,30 @@ impl<'s, T> Spec<'s, Option<T>>
         match self.subject {
             &Some(ref val) => {
                 if !val.eq(expected_value) {
-                    panic!(build_failure_string(&format!("<{:?}>", expected_value),
-                                                &format!("<{:?}>", val)));
+                    panic!(build_expectation_string(&format!("option<{:?}>", expected_value),
+                                                    &format!("option<{:?}>", val)));
                 }
             }
-            &None => panic!(build_failure_string(&format!("<{:?}>", expected_value), "empty")),
+            &None => {
+                panic!(build_expectation_string(&format!("option<{:?}>", expected_value),
+                                                &"option[empty]"))
+            }
         };
-
-        fn build_failure_string(containing: &str, actual: &str) -> String {
-            format!("expected option containing {} but was {}",
-                    containing,
-                    actual)
-        }
     }
 
     pub fn is_some(&self) {
         match self.subject {
             &Some(_) => (),
-            &None => panic!(format!("expected non-empty option but was empty")),
+            &None => panic!(build_expectation_string(&"option[some]", &"option[none]")),
         };
     }
 
     pub fn is_none(&self) {
         match self.subject {
             &None => (),
-            &Some(ref val) => panic!(format!("expected empty option but contained <{:?}>", val)),
+            &Some(ref val) => {
+                panic!(build_expectation_string(&"option[none]", &format!("option<{:?}>", val)))
+            }
         };
     }
 }
