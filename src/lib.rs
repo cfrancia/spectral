@@ -101,7 +101,7 @@ impl<'s, S> Spec<'s, S>
         where F: Fn(&'s S) -> bool
     {
         if !matching_function(self.subject) {
-            panic!(format!("expected failed for value <{:?}>", self.subject));
+            panic!(format!("expectation failed for value <{:?}>", self.subject));
         }
     }
 
