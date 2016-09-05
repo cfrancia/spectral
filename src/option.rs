@@ -10,13 +10,14 @@ impl<'s, T> Spec<'s, Option<T>>
         match self.subject {
             &Some(ref val) => {
                 if !val.eq(expected_value) {
-                    panic!(build_expectation_string(&format!("option<{:?}>", expected_value),
-                                                    &format!("option<{:?}>", val)));
+                    panic!(build_expectation_string(&format!("option to contain <{:?}>",
+                                                             expected_value),
+                                                    &format!("<{:?}>", val)));
                 }
             }
             &None => {
                 panic!(build_expectation_string(&format!("option<{:?}>", expected_value),
-                                                &"option[empty]"))
+                                                &"option[none]"))
             }
         };
     }

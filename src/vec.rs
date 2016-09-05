@@ -1,4 +1,4 @@
-use super::Spec;
+use super::{build_expectation_string, Spec};
 
 use std::cmp::PartialEq;
 use std::fmt::Debug;
@@ -7,9 +7,8 @@ impl<'s, T> Spec<'s, Vec<T>> {
     pub fn has_length(&self, expected: usize) {
         let length = self.subject.len();
         if length != expected {
-            panic!(format!("expected vec with length of <{:?}> but was <{:?}>",
-                           expected,
-                           length));
+            panic!(build_expectation_string(&format!("vec to have length <{}>", expected),
+                                            &format!("<{}>", length)));
         }
     }
 }
@@ -34,8 +33,7 @@ impl<'s, T> Spec<'s, Vec<T>>
     }
 
     fn panic_unmatched<E: Debug, A: Debug>(expected: E, actual: A) {
-        panic!(format!("expected vec to contain <{:?}> but contains <{:?}>",
-                       expected,
-                       actual));
+        panic!(build_expectation_string(&format!("vec to contain <{:?}>", expected),
+                                        &format!("<{:?}>", actual)));
     }
 }

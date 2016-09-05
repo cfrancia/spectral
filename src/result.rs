@@ -1,4 +1,4 @@
-use super::Spec;
+use super::{build_expectation_string, Spec};
 
 use std::fmt::Debug;
 
@@ -10,7 +10,8 @@ impl<'s, T, E> Spec<'s, Result<T, E>>
         match self.subject {
             &Ok(_) => (),
             &Err(ref err) => {
-                panic!(format!("expected ok result but was error result of <{:?}>", err))
+                panic!(build_expectation_string(&"result[ok]",
+                                                &format!("result[error]<{:?}>", err)));
             }
         };
     }
@@ -19,7 +20,8 @@ impl<'s, T, E> Spec<'s, Result<T, E>>
         match self.subject {
             &Err(_) => (),
             &Ok(ref val) => {
-                panic!(format!("expected error result but was ok result of <{:?}>", val))
+                panic!(build_expectation_string(&"result[error]",
+                                                &format!("result[ok]<{:?}>", val)));
             }
         };
     }

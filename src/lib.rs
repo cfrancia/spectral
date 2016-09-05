@@ -23,8 +23,8 @@ impl<'s, S> Spec<'s, S>
 {
     pub fn is_equal_to(&self, expected: &S) {
         if !self.subject.eq(expected) {
-            panic!(build_expectation_string(&format!("{:?}", expected),
-                                            &format!("{:?}", self.subject)));
+            panic!(build_expectation_string(&format!("<{:?}>", expected),
+                                            &format!("<{:?}>", self.subject)));
         }
     }
 }
@@ -36,7 +36,7 @@ impl<'s, S> Spec<'s, S>
         where F: Fn(&'s S) -> bool
     {
         if !matching_function(self.subject) {
-            panic!(format!("assertion failed on value of <{:?}>", self.subject));
+            panic!(format!("expectation failed for value <{:?}>", self.subject));
         }
     }
 
