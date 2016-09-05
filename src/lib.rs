@@ -1,9 +1,10 @@
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
-mod option;
-mod result;
-mod vec;
+pub mod option;
+pub mod prelude;
+pub mod result;
+pub mod vec;
 
 #[derive(Debug)]
 pub struct SpecDescription<'r> {
@@ -12,7 +13,7 @@ pub struct SpecDescription<'r> {
 
 #[derive(Debug)]
 pub struct Spec<'s, S: 's> {
-    subject: &'s S,
+    pub subject: &'s S,
     description: Option<&'s str>,
     expected: Option<String>,
     actual: Option<String>,
@@ -47,19 +48,19 @@ impl<'r> SpecDescription<'r> {
 }
 
 impl<'s, S> Spec<'s, S> {
-    fn with_expected(self, expected: String) -> Self {
+    pub fn with_expected(self, expected: String) -> Self {
         let mut spec = self;
         spec.expected = Some(expected);
         spec
     }
 
-    fn with_actual(self, actual: String) -> Self {
+    pub fn with_actual(self, actual: String) -> Self {
         let mut spec = self;
         spec.actual = Some(actual);
         spec
     }
 
-    fn fail(self) {
+    pub fn fail(self) {
         if !self.expected.is_some() || !self.actual.is_some() {
             panic!("invalid assertion");
         }

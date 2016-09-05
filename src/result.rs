@@ -2,11 +2,19 @@ use super::{build_expectation_string, Spec};
 
 use std::fmt::Debug;
 
-impl<'s, T, E> Spec<'s, Result<T, E>>
+pub trait ResultSpec<T, E>
     where T: Debug,
           E: Debug
 {
-    pub fn is_ok(&self) {
+    fn is_ok(&self);
+    fn is_error(&self);
+}
+
+impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
+    where T: Debug,
+          E: Debug
+{
+    fn is_ok(&self) {
         match self.subject {
             &Ok(_) => (),
             &Err(ref err) => {
@@ -16,7 +24,7 @@ impl<'s, T, E> Spec<'s, Result<T, E>>
         };
     }
 
-    pub fn is_error(&self) {
+    fn is_error(&self) {
         match self.subject {
             &Err(_) => (),
             &Ok(ref val) => {

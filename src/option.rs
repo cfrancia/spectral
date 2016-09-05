@@ -3,10 +3,23 @@ use super::{build_expectation_string, Spec};
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
-impl<'s, T> Spec<'s, Option<T>>
+pub trait OptionSpec<T>
+    where T: Debug
+{
+    fn is_some(&self);
+    fn is_none(&self);
+}
+
+pub trait ComparingOptionSpec<T>
     where T: Debug + PartialEq
 {
-    pub fn contains_value(&self, expected_value: &T) {
+    fn contains_value(&self, expected_value: &T);
+}
+
+impl<'s, T> ComparingOptionSpec<T> for Spec<'s, Option<T>>
+    where T: Debug + PartialEq
+{
+    fn contains_value(&self, expected_value: &T) {
         match self.subject {
             &Some(ref val) => {
                 if !val.eq(expected_value) {
@@ -21,15 +34,19 @@ impl<'s, T> Spec<'s, Option<T>>
             }
         };
     }
+}
 
-    pub fn is_some(&self) {
+impl<'s, T> OptionSpec<T> for Spec<'s, Option<T>>
+    where T: Debug
+{
+    fn is_some(&self) {
         match self.subject {
             &Some(_) => (),
             &None => panic!(build_expectation_string(&"option[some]", &"option[none]")),
         };
     }
 
-    pub fn is_none(&self) {
+    fn is_none(&self) {
         match self.subject {
             &None => (),
             &Some(ref val) => {

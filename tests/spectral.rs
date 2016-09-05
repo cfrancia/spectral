@@ -1,6 +1,6 @@
 extern crate spectral;
 
-use spectral::{asserting, assert_that};
+use spectral::prelude::*;
 
 #[test]
 #[should_panic(expected = "test condition: expected <2> but was <1>")]
