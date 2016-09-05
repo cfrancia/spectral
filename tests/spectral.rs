@@ -1,6 +1,12 @@
 extern crate spectral;
 
-use spectral::assert_that;
+use spectral::{asserting, assert_that};
+
+#[test]
+#[should_panic(expected = "test condition: expected <2> but was <1>")]
+fn should_contain_assertion_description_in_panic() {
+    asserting(&"test condition").that(&1).is_equal_to(&2);
+}
 
 #[test]
 fn should_not_panic_on_equal_subjects() {
