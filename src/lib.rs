@@ -32,10 +32,6 @@ pub fn asserting<'r>(description: &'r str) -> SpecDescription {
     SpecDescription { value: description }
 }
 
-fn build_expectation_string(expected: &str, actual: &str) -> String {
-    format!("expected {} but was {}", expected, actual)
-}
-
 impl<'r> SpecDescription<'r> {
     pub fn that<S>(self, subject: &'r S) -> Spec<'r, S> {
         Spec {
