@@ -3,5 +3,8 @@ name = "spectral"
 version = "0.1.0"
 authors = ["cfrancia <cfrancia@users.noreply.github.com>"]
 license = "Apache-2.0"
+description = "Fluent test assertions"
+repository = "https://github.com/cfrancia/spectral"
+keywords = ["fluent", "test", "tests", "testing", "assert", "asserts", "assertion", "assertions"]
 
 [dependencies]
