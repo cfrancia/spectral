@@ -5,6 +5,7 @@ pub mod numeric;
 pub mod option;
 pub mod prelude;
 pub mod result;
+pub mod string;
 pub mod vec;
 
 #[derive(Debug)]
