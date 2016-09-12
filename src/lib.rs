@@ -1,6 +1,7 @@
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
+pub mod numeric;
 pub mod option;
 pub mod prelude;
 pub mod result;
