@@ -9,7 +9,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-spectral = { git = "https://github.com/cfrancia/spectral" }
+spectral = "0.1.0"
 ```
 
 Then add this to your crate:
