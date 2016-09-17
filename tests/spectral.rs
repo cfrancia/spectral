@@ -121,6 +121,37 @@ fn should_panic_if_iterator_does_not_contain_value() {
 }
 
 #[test]
+fn should_not_panic_if_iterator_matches_on_value() {
+    let mut test_into_iter = LinkedList::new();
+    test_into_iter.push_back(TestEnum::Bad);
+    test_into_iter.push_back(TestEnum::Good);
+    test_into_iter.push_back(TestEnum::Bad);
+
+    assert_that(&test_into_iter).matching_contains(|val| {
+        match val {
+            &TestEnum::Good => true,
+            _ => false
+        }
+    });
+}
+
+#[test]
+#[should_panic(expected = "expectation failed for iterator with values <[Bad, Bad, Bad]>")]
+fn should_panic_if_iterator_does_not_match_on_value() {
+    let mut test_into_iter = LinkedList::new();
+    test_into_iter.push_back(TestEnum::Bad);
+    test_into_iter.push_back(TestEnum::Bad);
+    test_into_iter.push_back(TestEnum::Bad);
+
+    assert_that(&test_into_iter).matching_contains(|val| {
+        match val {
+            &TestEnum::Good => true,
+            _ => false
+        }
+    });
+}
+
+#[test]
 fn should_not_panic_if_vec_contains_mapped_value() {
     let test_vec = vec![TestStruct { value: 5  }, TestStruct { value: 6 }];
     assert_that(&test_vec).mapped_contains(|val| &val.value, &5);
@@ -266,4 +297,10 @@ fn should_be_able_to_map_to_inner_field_of_struct_when_matching() {
 #[derive(Debug, PartialEq)]
 struct TestStruct {
     pub value: u8,
+}
+
+#[derive(Debug)]
+enum TestEnum {
+    Good,
+    Bad
 }
