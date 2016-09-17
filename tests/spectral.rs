@@ -1,6 +1,7 @@
 extern crate spectral;
 
 use spectral::prelude::*;
+use std::collections::LinkedList;
 
 #[test]
 #[should_panic(expected = "test condition: expected <2> but was <1>")]
@@ -92,10 +93,31 @@ fn should_not_panic_if_vec_contains_value() {
 }
 
 #[test]
-#[should_panic(expected = "expected vec to contain <5> but was <[1, 2, 3]>")]
+#[should_panic(expected = "expected iterator to contain <5> but was <[1, 2, 3]>")]
 fn should_panic_if_vec_does_not_contain_value() {
     let test_vec = vec![1,2,3];
     assert_that(&test_vec).contains(&5);
+}
+
+#[test]
+fn should_not_panic_if_iterator_contains_value() {
+    let mut test_into_iter = LinkedList::new();
+    test_into_iter.push_back(1);
+    test_into_iter.push_back(2);
+    test_into_iter.push_back(3);
+
+    assert_that(&test_into_iter).contains(&2);
+}
+
+#[test]
+#[should_panic(expected = "expected iterator to contain <5> but was <[1, 2, 3]>")]
+fn should_panic_if_iterator_does_not_contain_value() {
+    let mut test_into_iter = LinkedList::new();
+    test_into_iter.push_back(1);
+    test_into_iter.push_back(2);
+    test_into_iter.push_back(3);
+
+    assert_that(&test_into_iter).contains(&5);
 }
 
 #[test]

@@ -7,6 +7,7 @@ pub mod prelude;
 pub mod result;
 pub mod string;
 pub mod vec;
+pub mod iter;
 
 #[derive(Debug)]
 pub struct SpecDescription<'r> {
