@@ -21,7 +21,6 @@ impl<'s, T> VecSpec for Spec<'s, Vec<T>> {
 pub trait ComparingVecSpec<'s, T: 's>
     where T: Debug + PartialEq
 {
-    fn contains(self, expected_value: &T);
     fn mapped_contains<F, M: 's>(self, mapping_function: F, expected_value: &M)
         where M: Debug + PartialEq,
               F: Fn(&'s T) -> &M;
@@ -30,13 +29,6 @@ pub trait ComparingVecSpec<'s, T: 's>
 impl<'s, T> ComparingVecSpec<'s, T> for Spec<'s, Vec<T>>
     where T: Debug + PartialEq
 {
-    fn contains(self, expected_value: &T) {
-        let subject = self.subject;
-        if !subject.contains(expected_value) {
-            self.panic_unmatched(expected_value, subject);
-        }
-    }
-
     fn mapped_contains<F, M: 's>(self, mapping_function: F, expected_value: &M)
         where M: Debug + PartialEq,
               F: Fn(&'s T) -> &M
