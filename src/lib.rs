@@ -47,19 +47,19 @@ impl<'r> SpecDescription<'r> {
 }
 
 impl<'s, S> Spec<'s, S> {
-    pub fn with_expected(self, expected: String) -> Self {
+    pub fn with_expected(&mut self, expected: String) -> &mut Self {
         let mut spec = self;
         spec.expected = Some(expected);
         spec
     }
 
-    pub fn with_actual(self, actual: String) -> Self {
+    pub fn with_actual(&mut self, actual: String) -> &mut Self {
         let mut spec = self;
         spec.actual = Some(actual);
         spec
     }
 
-    pub fn fail(self) {
+    pub fn fail(&mut self) {
         if !self.expected.is_some() || !self.actual.is_some() {
             panic!("invalid assertion");
         }
@@ -68,18 +68,18 @@ impl<'s, S> Spec<'s, S> {
             Some(description) => {
                 panic!(format!("{}: expected {} but was {}",
                                description,
-                               self.expected.unwrap(),
-                               self.actual.unwrap()))
+                               self.expected.clone().unwrap(),
+                               self.actual.clone().unwrap()))
             }
             None => {
                 panic!(format!("expected {} but was {}",
-                               self.expected.unwrap(),
-                               self.actual.unwrap()))
+                               self.expected.clone().unwrap(),
+                               self.actual.clone().unwrap()))
             }
         }
     }
 
-    fn fail_with_message(self, message: String) {
+    fn fail_with_message(&mut self, message: String) {
         match self.description {
             Some(description) => panic!(format!("{}: {}", description, message)),
             None => panic!(message),
@@ -90,7 +90,7 @@ impl<'s, S> Spec<'s, S> {
 impl<'s, S> Spec<'s, S>
     where S: Debug + PartialEq
 {
-    pub fn is_equal_to(self, expected: &S) {
+    pub fn is_equal_to(&mut self, expected: &S) -> &mut Self {
         let subject = self.subject;
 
         if !subject.eq(expected) {
@@ -98,13 +98,15 @@ impl<'s, S> Spec<'s, S>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
+
+        self
     }
 }
 
 impl<'s, S> Spec<'s, S>
     where S: Debug
 {
-    pub fn matches<F>(self, matching_function: F)
+    pub fn matches<F>(&mut self, matching_function: F) -> &mut Self
         where F: Fn(&'s S) -> bool
     {
         let subject = self.subject;
@@ -112,6 +114,8 @@ impl<'s, S> Spec<'s, S>
         if !matching_function(subject) {
             self.fail_with_message(format!("expectation failed for value <{:?}>", subject));
         }
+
+        self
     }
 
     pub fn map<F, T>(self, mapping_function: F) -> Spec<'s, T>

@@ -6,15 +6,15 @@ pub trait ResultSpec<T, E>
     where T: Debug,
           E: Debug
 {
-    fn is_ok(self);
-    fn is_error(self);
+    fn is_ok(&mut self) -> &mut Self;
+    fn is_error(&mut self) -> &mut Self;
 }
 
 impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
     where T: Debug,
           E: Debug
 {
-    fn is_ok(self) {
+    fn is_ok(&mut self) -> &mut Self {
         match self.subject {
             &Ok(_) => (),
             &Err(ref err) => {
@@ -23,9 +23,11 @@ impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
                     .fail();
             }
         };
+
+        self
     }
 
-    fn is_error(self) {
+    fn is_error(&mut self) -> &mut Self {
         match self.subject {
             &Err(_) => (),
             &Ok(ref val) => {
@@ -34,5 +36,7 @@ impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
                     .fail();
             }
         };
+
+        self
     }
 }

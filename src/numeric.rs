@@ -6,16 +6,16 @@ use std::cmp::PartialOrd;
 pub trait OrderedSpec<T>
     where T: Debug + PartialOrd
 {
-    fn is_less_than(self, other: &T);
-    fn is_less_than_or_equal_to(self, other: &T);
-    fn is_greater_than(self, other: &T);
-    fn is_greater_than_or_equal_to(self, other: &T);
+    fn is_less_than(&mut self, other: &T) -> &mut Self;
+    fn is_less_than_or_equal_to(&mut self, other: &T) -> &mut Self;
+    fn is_greater_than(&mut self, other: &T) -> &mut Self;
+    fn is_greater_than_or_equal_to(&mut self, other: &T) -> &mut Self;
 }
 
 impl<'s, T> OrderedSpec<T> for Spec<'s, T>
     where T: Debug + PartialOrd
 {
-    fn is_less_than(self, other: &T) {
+    fn is_less_than(&mut self, other: &T) -> &mut Self {
         let subject = self.subject;
 
         if subject >= other {
@@ -23,9 +23,11 @@ impl<'s, T> OrderedSpec<T> for Spec<'s, T>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
+
+        self
     }
 
-    fn is_less_than_or_equal_to(self, other: &T) {
+    fn is_less_than_or_equal_to(&mut self, other: &T) -> &mut Self {
         let subject = self.subject;
 
         if subject > other {
@@ -33,9 +35,11 @@ impl<'s, T> OrderedSpec<T> for Spec<'s, T>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
+
+        self
     }
 
-    fn is_greater_than(self, other: &T) {
+    fn is_greater_than(&mut self, other: &T) -> &mut Self {
         let subject = self.subject;
 
         if subject <= other {
@@ -43,9 +47,11 @@ impl<'s, T> OrderedSpec<T> for Spec<'s, T>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
+
+        self
     }
 
-    fn is_greater_than_or_equal_to(self, other: &T) {
+    fn is_greater_than_or_equal_to(&mut self, other: &T) -> &mut Self {
         let subject = self.subject;
 
         if subject < other {
@@ -53,5 +59,7 @@ impl<'s, T> OrderedSpec<T> for Spec<'s, T>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
+
+        self
     }
 }

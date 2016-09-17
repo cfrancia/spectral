@@ -6,20 +6,20 @@ use std::fmt::Debug;
 pub trait OptionSpec<T>
     where T: Debug
 {
-    fn is_some(self);
-    fn is_none(self);
+    fn is_some(&mut self) -> &mut Self;
+    fn is_none(&mut self) -> &mut Self;
 }
 
 pub trait ComparingOptionSpec<T>
     where T: Debug + PartialEq
 {
-    fn contains_value(self, expected_value: &T);
+    fn contains_value(&mut self, expected_value: &T) -> &mut Self;
 }
 
 impl<'s, T> ComparingOptionSpec<T> for Spec<'s, Option<T>>
     where T: Debug + PartialEq
 {
-    fn contains_value(self, expected_value: &T) {
+    fn contains_value(&mut self, expected_value: &T) -> &mut Self {
         match self.subject {
             &Some(ref val) => {
                 if !val.eq(expected_value) {
@@ -34,13 +34,15 @@ impl<'s, T> ComparingOptionSpec<T> for Spec<'s, Option<T>>
                     .fail();
             }
         };
+
+        self
     }
 }
 
 impl<'s, T> OptionSpec<T> for Spec<'s, Option<T>>
     where T: Debug
 {
-    fn is_some(self) {
+    fn is_some(&mut self) -> &mut Self {
         match self.subject {
             &Some(_) => (),
             &None => {
@@ -49,9 +51,11 @@ impl<'s, T> OptionSpec<T> for Spec<'s, Option<T>>
                     .fail();
             }
         };
+
+        self
     }
 
-    fn is_none(self) {
+    fn is_none(&mut self) -> &mut Self {
         match self.subject {
             &None => (),
             &Some(ref val) => {
@@ -60,5 +64,7 @@ impl<'s, T> OptionSpec<T> for Spec<'s, Option<T>>
                     .fail();
             }
         };
+
+        self
     }
 }

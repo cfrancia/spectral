@@ -4,6 +4,15 @@ use spectral::prelude::*;
 use std::collections::LinkedList;
 
 #[test]
+fn should_be_able_to_chain_assertions() {
+    assert_that(&vec![1, 2, 3, 4, 5])
+        .has_length(5)
+        .contains(&3)
+        .contains(&5)
+        .mapped_contains(|val| val * 2, &6);
+}
+
+#[test]
 #[should_panic(expected = "test condition: expected <2> but was <1>")]
 fn should_contain_assertion_description_in_panic() {
     asserting(&"test condition").that(&1).is_equal_to(&2);
@@ -154,14 +163,14 @@ fn should_panic_if_iterator_does_not_match_on_value() {
 #[test]
 fn should_not_panic_if_vec_contains_mapped_value() {
     let test_vec = vec![TestStruct { value: 5  }, TestStruct { value: 6 }];
-    assert_that(&test_vec).mapped_contains(|val| &val.value, &5);
+    assert_that(&test_vec).mapped_contains(|val| val.value, &5);
 }
 
 #[test]
 #[should_panic(expected = "expected vec to contain <1> but was <[5, 6]>")]
 fn should_panic_if_vec_does_not_contain_mapped_value() {
     let test_vec = vec![TestStruct { value: 5  }, TestStruct { value: 6 }];
-    assert_that(&test_vec).mapped_contains(|val| &val.value, &1);
+    assert_that(&test_vec).mapped_contains(|val| val.value, &1);
 }
 
 #[test]
