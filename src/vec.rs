@@ -20,16 +20,16 @@ impl<'s, T> VecSpec for Spec<'s, Vec<T>> {
     }
 }
 
-pub trait ComparingVecSpec<'s, T: 's>
-    where T: Debug + PartialEq
+pub trait MappingComparingVecSpec<'s, T: 's>
+    where T: Debug
 {
     fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M) -> &mut Self
         where M: Debug + PartialEq,
               F: Fn(&'s T) -> M;
 }
 
-impl<'s, T> ComparingVecSpec<'s, T> for Spec<'s, Vec<T>>
-    where T: Debug + PartialEq
+impl<'s, T> MappingComparingVecSpec<'s, T> for Spec<'s, Vec<T>>
+    where T: Debug
 {
     fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M) -> &mut Self
         where M: Debug + PartialEq,
