@@ -1,10 +1,11 @@
 [package]
 name = "spectral"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["cfrancia <cfrancia@users.noreply.github.com>"]
 license = "Apache-2.0"
 description = "Fluent test assertions"
 repository = "https://github.com/cfrancia/spectral"
+readme = "README.md"
 keywords = ["fluent", "testing", "matchers", "assert", "assertions"]
 
 [dependencies]
