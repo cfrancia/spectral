@@ -86,161 +86,35 @@ As a general note, any type under test will usually need to implement at least `
 
 ### General
 #### is_equal_to
-
-Asserts that the actual value and the expected value are equal. The value type must implement `PartialEq`.
-
-```rust
-assert_that(&"hello").is_equal_to(&"hello");
-```
-
 #### matches
 
-Accepts a function accepting the value type which returns a `bool`. Returning `false` will cause the assertion to fail.
-
-NOTE: The resultant panic message will only state the actual value. It's recommended that you write your own assertion rather than relying upon this.
-
-```rust
-assert_that(&"hello").matches(|x| x.eq(&"hello"));
-```
-
 ### Numbers
-
 #### is_less_than
-
-Asserts that the actual value is less than the expected value. The value type must implement `PartialOrd`.
-
-```rust
-assert_that(&1).is_less_than(&2);
-```
-
 #### is_less_than_or_equal_to
-
-Asserts that the actual value is less than or equal to the expected value. The value type must implement `PartialOrd`.
-
-```rust
-assert_that(&2).is_less_than_or_equal_to(&2);
-```
-
 #### is_greater_than
-
-Asserts that the actual value is greater than the expected value. The value type must implement `PartialOrd`.
-
-```rust
-assert_that(&2).is_greater_than(&1);
-```
-
 #### is_greater_than_or_equal_to
 
-Asserts that the actual value is greater than or equal to the expected value. The value type must implement `PartialOrd`.
-
-```rust
-assert_that(&2).is_greater_than_or_equal_to(&1);
-```
-
 ### Options
-
 #### is_some
-
-Asserts that the actual value is `Some`. The value type must be an `enum`.
-
-```rust
-assert_that(&Some(1)).is_some();
-```
-
 #### is_none
-
-Asserts that the actual value is `None`. The value type must be an `enum`.
-
-```rust
-assert_that(&Option::None::<String>).is_none();
-```
-
 #### contains_value
 
-Asserts that the actual value is a `Some` containing the expected value. The value type must be an `enum`.
-
-```rust
-assert_that(&Some(1)).contains_value(&1);
-```
-
 ### Results
-
 #### is_ok
-
-Asserts that the actual value is `Ok`. The value type must be `Result`.
-
-```rust
-assert_that(&Result::Ok::<usize, usize>(1)).is_ok();
-```
-
 #### is_error
 
-Asserts that the actual value is `Err`. The value type must be `Result`.
-
-```rust
-assert_that(&Result::Err::<usize, usize>(1)).is_error();
-```
-
 ### Strings
-
 #### starts_with
-
-Asserts that the actual `&str` starts with the provided `&str`.
-
-```rust
-assert_that(&"Hello").starts_with(&"H");
-```
-
 #### ends_with
-
-Asserts that the actual `&str` ends with the provided `&str`.
-
-```rust
-assert_that(&"Hello").ends_with(&"o");
-```
-
 #### contains
-
-Asserts that the actual `&str` contains the provided `&str`.
-
-```rust
-assert_that(&"Hello").contains(&"e");
-```
 
 ### Vectors
-
 #### has_length
-
-Asserts that the length of the actual vector is equal to the provided length. The value type must be of `Vec`.
-
-```rust
-assert_that(&vec![1, 2, 3, 4]).has_length(4);
-```
-
-#### contains
-
-Asserts that the actual `Vec` contains the provided value. The generic type of the `Vec` must implement `PartialEq`.
-
-```rust
-assert_that(&vec![1, 2, 3, 4]).contains(&4);
-```
-
 #### mapped_contains
 
-Maps the values of the actual `Vec` before asserting that the mapped `Vec` contains the provided value. The type of the mapped value must implement `PartialEq`.
-
-NOTE: The panic message will refer to the mapped values rather than the values present in the original `Vec`.
-
-```rust
-#[derive(PartialEq, Debug)]
-struct Simple {
-    pub val: usize,
-}
-
-...
-
-assert_that(&vec![Simple { val: 1 }, Simple { val: 2 } ]).mapped_contains(|x| &x.val, &2);
-```
+### IntoIterator
+#### contains
+#### matching_contains
 
 ## How it works
 

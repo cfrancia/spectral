@@ -160,11 +160,18 @@ macro_rules! assert_that {
     };
 }
 
+/// A description for an assertion.
+///
+/// This is created by the `asserting` function.
 #[derive(Debug)]
 pub struct SpecDescription<'r> {
     value: &'r str,
 }
 
+/// An assertion.
+///
+/// This is created by either the `assert_that` function, or by calling `that` on a
+/// `SpecDescription`.
 #[derive(Debug)]
 pub struct Spec<'s, S: 's> {
     pub subject: &'s S,
@@ -173,6 +180,9 @@ pub struct Spec<'s, S: 's> {
     actual: Option<String>,
 }
 
+/// Wraps a subject in a `Spec` to provide assertions against it.
+///
+/// The subject must be a reference.
 pub fn assert_that<'s, S>(subject: &'s S) -> Spec<'s, S> {
     Spec {
         subject: subject,
@@ -182,11 +192,13 @@ pub fn assert_that<'s, S>(subject: &'s S) -> Spec<'s, S> {
     }
 }
 
+/// Describes an assertion.
 pub fn asserting<'r>(description: &'r str) -> SpecDescription {
     SpecDescription { value: description }
 }
 
 impl<'r> SpecDescription<'r> {
+    /// Creates a new assertion, passing through its description.
     pub fn that<S>(self, subject: &'r S) -> Spec<'r, S> {
         Spec {
             subject: subject,
@@ -198,18 +210,22 @@ impl<'r> SpecDescription<'r> {
 }
 
 impl<'s, S> Spec<'s, S> {
+    /// Builder method to add the expected value for the panic message.
     pub fn with_expected(&mut self, expected: String) -> &mut Self {
         let mut spec = self;
         spec.expected = Some(expected);
         spec
     }
 
+    /// Builder method to add the actual value for the panic message.
     pub fn with_actual(&mut self, actual: String) -> &mut Self {
         let mut spec = self;
         spec.actual = Some(actual);
         spec
     }
 
+    /// Builds the failure message with a description (if present), the expected value,
+    /// and the actual value and then calls `panic` with the created message.
     pub fn fail(&mut self) {
         if !self.expected.is_some() || !self.actual.is_some() {
             panic!("invalid assertion");
@@ -230,6 +246,8 @@ impl<'s, S> Spec<'s, S> {
         }
     }
 
+    /// Calls `panic` with the provided message, prepending the assertion description
+    /// if present.
     fn fail_with_message(&mut self, message: String) {
         match self.description {
             Some(description) => panic!(format!("{}: {}", description, message)),
@@ -241,6 +259,12 @@ impl<'s, S> Spec<'s, S> {
 impl<'s, S> Spec<'s, S>
     where S: Debug + PartialEq
 {
+    /// Asserts that the actual value and the expected value are equal. The value type must
+    /// implement `PartialEq`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&"hello").is_equal_to(&"hello");
+    /// ```
     pub fn is_equal_to(&mut self, expected: &S) -> &mut Self {
         let subject = self.subject;
 
@@ -257,6 +281,15 @@ impl<'s, S> Spec<'s, S>
 impl<'s, S> Spec<'s, S>
     where S: Debug
 {
+    /// Accepts a function accepting the value type which returns a bool. Returning false will
+    /// cause the assertion to fail.
+    ///
+    /// NOTE: The resultant panic message will only state the actual value. It's recommended that
+    /// you write your own assertion rather than relying upon this.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&"hello").matches(|x| x.eq(&"hello"));
+    /// ```
     pub fn matches<F>(&mut self, matching_function: F) -> &mut Self
         where F: Fn(&'s S) -> bool
     {
@@ -269,6 +302,13 @@ impl<'s, S> Spec<'s, S>
         self
     }
 
+    /// Transforms the subject of the `Spec` by passing it through to the provided mapping
+    /// function.
+    ///
+    /// ```rust,ignore
+    /// let test_struct = TestStruct { value: 5 };
+    /// assert_that(&test_struct).map(|val| &val.value).is_equal_to(&5);
+    /// ```
     pub fn map<F, T>(self, mapping_function: F) -> Spec<'s, T>
         where F: Fn(&'s S) -> &'s T
     {

@@ -7,6 +7,11 @@ pub trait StrSpec {
 }
 
 impl<'s> StrSpec for Spec<'s, &'s str> {
+    /// Asserts that the subject `&str` starts with the provided `&str`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&"Hello").starts_with(&"H");
+    /// ```
     fn starts_with(&mut self, expected: &str) -> &mut Self {
         let subject = self.subject;
 
@@ -19,6 +24,11 @@ impl<'s> StrSpec for Spec<'s, &'s str> {
         self
     }
 
+    /// Asserts that the subject `&str` ends with the provided `&str`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&"Hello").ends_with(&"o");
+    /// ```
     fn ends_with(&mut self, expected: &str) -> &mut Self {
         let subject = self.subject;
 
@@ -31,6 +41,11 @@ impl<'s> StrSpec for Spec<'s, &'s str> {
         self
     }
 
+    /// Asserts that the subject `&str` contains the provided `&str`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&"Hello").contains(&"e");
+    /// ```
     fn contains(&mut self, expected: &str) -> &mut Self {
         let subject = self.subject;
 

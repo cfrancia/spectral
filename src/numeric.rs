@@ -15,6 +15,12 @@ pub trait OrderedSpec<T>
 impl<'s, T> OrderedSpec<T> for Spec<'s, T>
     where T: Debug + PartialOrd
 {
+    /// Asserts that the subject is less than the expected value. The subject type must
+    /// implement `PartialOrd`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&1).is_less_than(&2);
+    /// ```
     fn is_less_than(&mut self, other: &T) -> &mut Self {
         let subject = self.subject;
 
@@ -27,6 +33,12 @@ impl<'s, T> OrderedSpec<T> for Spec<'s, T>
         self
     }
 
+    /// Asserts that the subject is less than or equal to the expected value. The subject type
+    /// must implement `PartialOrd`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&2).is_less_than_or_equal_to(&2);
+    /// ```
     fn is_less_than_or_equal_to(&mut self, other: &T) -> &mut Self {
         let subject = self.subject;
 
@@ -39,6 +51,12 @@ impl<'s, T> OrderedSpec<T> for Spec<'s, T>
         self
     }
 
+    /// Asserts that the subject is greater than the expected value. The subject type must
+    /// implement `PartialOrd`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&2).is_greater_than(&1);
+    /// ```
     fn is_greater_than(&mut self, other: &T) -> &mut Self {
         let subject = self.subject;
 
@@ -51,6 +69,12 @@ impl<'s, T> OrderedSpec<T> for Spec<'s, T>
         self
     }
 
+    /// Asserts that the subject is greater than or equal to the expected value. The subject
+    /// type must implement `PartialOrd`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&2).is_greater_than_or_equal_to(&1);
+    /// ```
     fn is_greater_than_or_equal_to(&mut self, other: &T) -> &mut Self {
         let subject = self.subject;
 

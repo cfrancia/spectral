@@ -14,6 +14,11 @@ impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
     where T: Debug,
           E: Debug
 {
+    /// Asserts that the subject is `Ok`. The value type must be a `Result`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&Result::Ok::<usize, usize>(1)).is_ok();
+    /// ```
     fn is_ok(&mut self) -> &mut Self {
         match self.subject {
             &Ok(_) => (),
@@ -27,6 +32,11 @@ impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
         self
     }
 
+    /// Asserts that the subject is `Err`. The value type must be a `Result`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&Result::Err::<usize, usize>(1)).is_error();
+    /// ```
     fn is_error(&mut self) -> &mut Self {
         match self.subject {
             &Err(_) => (),

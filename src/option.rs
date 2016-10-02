@@ -19,6 +19,12 @@ pub trait ComparingOptionSpec<T>
 impl<'s, T> ComparingOptionSpec<T> for Spec<'s, Option<T>>
     where T: Debug + PartialEq
 {
+    /// Asserts that the subject is a `Some` containing the expected value. The subject type must
+    /// be an `Option`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&Some(1)).contains_value(&1);
+    /// ```
     fn contains_value(&mut self, expected_value: &T) -> &mut Self {
         match self.subject {
             &Some(ref val) => {
@@ -42,6 +48,11 @@ impl<'s, T> ComparingOptionSpec<T> for Spec<'s, Option<T>>
 impl<'s, T> OptionSpec<T> for Spec<'s, Option<T>>
     where T: Debug
 {
+    /// Asserts that the subject is `Some`. The subject type must be an `Option`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&Some(1)).is_some();
+    /// ```
     fn is_some(&mut self) -> &mut Self {
         match self.subject {
             &Some(_) => (),
@@ -55,6 +66,11 @@ impl<'s, T> OptionSpec<T> for Spec<'s, Option<T>>
         self
     }
 
+    /// Asserts that the subject is `None`. The value type must be an `Option`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&Option::None::<String>).is_none();
+    /// ```
     fn is_none(&mut self) -> &mut Self {
         match self.subject {
             &None => (),
