@@ -1,7 +1,30 @@
+#[macro_use]
 extern crate spectral;
 
 use spectral::prelude::*;
 use std::collections::LinkedList;
+
+#[test]
+fn should_be_able_to_use_macro_form_with_deliberate_reference() {
+    let test_vec = vec![1, 2, 3, 4, 5];
+
+    assert_that!(&test_vec)
+        .has_length(5)
+        .contains(&3)
+        .contains(&5)
+        .mapped_contains(|val| val * 2, &6);
+}
+
+#[test]
+fn should_be_able_to_use_macro_form_without_deliberate_reference() {
+    let test_vec = vec![1, 2, 3, 4, 5];
+
+    assert_that!(test_vec)
+        .has_length(5)
+        .contains(&3)
+        .contains(&5)
+        .mapped_contains(|val| val * 2, &6);
+}
 
 #[test]
 fn should_be_able_to_chain_assertions() {

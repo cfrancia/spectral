@@ -9,6 +9,16 @@ pub mod string;
 pub mod vec;
 pub mod iter;
 
+#[macro_export]
+macro_rules! assert_that {
+    (&$subject:ident$(.$additional_subject:ident)*) => {
+        assert_that!($subject$(.$additional_subject)*)
+    };
+    ($subject:ident$(.$additional_subject:ident)*) => {
+        assert_that(&$subject$(.$additional_subject)*)
+    };
+}
+
 #[derive(Debug)]
 pub struct SpecDescription<'r> {
     value: &'r str,

@@ -66,6 +66,20 @@ let test_struct = TestStruct { value: 5 };
 assert_that(&test_struct).map(|val| &val.value).is_equal_to(&5);
 ```
 
+## Macros
+
+If you add `#[macro_use]` to the `extern crate` declaration, you can also use the macro form of `assert_that`.
+
+```rust
+assert_that!(test_vec).has_length(5)
+```
+
+This allows you to pass through a subject to test without needing to deliberately turn it into a reference. However, for consistency, you can also use a deliberate reference in the macro as well.
+
+```rust
+assert_that!(&test_vec).has_length(5)
+```
+
 ## Assertions
 
 As a general note, any type under test will usually need to implement at least `Debug`. Other assertions will have varying bounds attached to them.
