@@ -320,3 +320,89 @@ impl<'s, S> Spec<'s, S>
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::prelude::*;
+
+    #[test]
+    fn should_be_able_to_use_macro_form_with_deliberate_reference() {
+        let test_vec = vec![1, 2, 3, 4, 5];
+
+        assert_that!(&test_vec)
+            .has_length(5)
+            .contains(&3)
+            .contains(&5)
+            .mapped_contains(|val| val * 2, &6);
+    }
+
+    #[test]
+    fn should_be_able_to_use_macro_form_without_deliberate_reference() {
+        let test_vec = vec![1, 2, 3, 4, 5];
+
+        assert_that!(test_vec)
+            .has_length(5)
+            .contains(&3)
+            .contains(&5)
+            .mapped_contains(|val| val * 2, &6);
+    }
+
+    #[test]
+    fn should_be_able_to_chain_assertions() {
+        assert_that(&vec![1, 2, 3, 4, 5])
+            .has_length(5)
+            .contains(&3)
+            .contains(&5)
+            .mapped_contains(|val| val * 2, &6);
+    }
+
+    #[test]
+    #[should_panic(expected = "test condition: expected <2> but was <1>")]
+    fn should_contain_assertion_description_in_panic() {
+        asserting(&"test condition").that(&1).is_equal_to(&2);
+    }
+
+    #[test]
+    #[should_panic(expected = "closure: expectation failed for value <\"Hello\">")]
+    fn should_contain_assertion_description_if_message_is_provided() {
+        let value = "Hello";
+        asserting(&"closure").that(&value).matches(|val| val.eq(&"Hi"));
+    }
+
+    #[test]
+    fn should_not_panic_on_equal_subjects() {
+        assert_that(&1).is_equal_to(&1);
+    }
+
+    #[test]
+    #[should_panic(expected = "expected <2> but was <1>")]
+    fn should_panic_on_unequal_subjects() {
+        assert_that(&1).is_equal_to(&2);
+    }
+
+    #[test]
+    fn should_not_panic_if_value_matches() {
+        let value = "Hello";
+        assert_that(&value).matches(|val| val.eq(&"Hello"));
+    }
+
+    #[test]
+    #[should_panic(expected = "expectation failed for value <\"Hello\">")]
+    fn should_panic_if_value_does_not_match() {
+        let value = "Hello";
+        assert_that(&value).matches(|val| val.eq(&"Hi"));
+    }
+
+    #[test]
+    fn should_be_able_to_map_to_inner_field_of_struct_when_matching() {
+        let test_struct = TestStruct { value: 5 };
+        assert_that(&test_struct).map(|val| &val.value).is_equal_to(&5);
+    }
+
+    #[derive(Debug, PartialEq)]
+    struct TestStruct {
+        pub value: u8,
+    }
+
+}

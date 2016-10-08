@@ -1,8 +1,5 @@
 use super::Spec;
 
-use std::cmp::PartialEq;
-use std::fmt::Debug;
-
 pub trait VecSpec {
     fn has_length(&mut self, expected: usize) -> &mut Self;
 }
@@ -26,52 +23,22 @@ impl<'s, T> VecSpec for Spec<'s, Vec<T>> {
     }
 }
 
-pub trait MappingComparingVecSpec<'s, T: 's>
-    where T: Debug
-{
-    fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M) -> &mut Self
-        where M: Debug + PartialEq,
-              F: Fn(&'s T) -> M;
-}
+#[cfg(test)]
+mod tests {
 
-impl<'s, T> MappingComparingVecSpec<'s, T> for Spec<'s, Vec<T>>
-    where T: Debug
-{
-    /// Maps the values of the subject `Vec` before asserting that the mapped `Vec` contains the
-    /// provided value. The type of the mapped value must implement `PartialEq`.
-    ///
-    /// NOTE: The panic message will refer to the mapped values rather than the values present in
-    /// the original `Vec`.
-    ///
-    /// ```rust,ignore
-    /// #[derive(PartialEq, Debug)]
-    /// struct Simple {
-    ///     pub val: usize,
-    /// }
-    ///
-    /// ...
-    ///
-    /// assert_that(&vec![Simple { val: 1 }, Simple { val: 2 } ]).mapped_contains(|x| &x.val, &2);
-    /// ```
-    fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M) -> &mut Self
-        where M: Debug + PartialEq,
-              F: Fn(&'s T) -> M
-    {
-        let subject = self.subject;
+    use super::super::prelude::*;
 
-        let mapped_vec: Vec<M> = subject.iter().map(mapping_function).collect();
-        if !mapped_vec.contains(&expected_value) {
-            self.panic_unmatched(expected_value, mapped_vec);
-        }
-
-        self
+    #[test]
+    fn should_not_panic_if_vec_length_matches_expected() {
+        let test_vec = vec![1, 2, 3];
+        assert_that(&test_vec).has_length(3);
     }
-}
 
-impl<'s, T> Spec<'s, Vec<T>> {
-    fn panic_unmatched<E: Debug, A: Debug>(&mut self, expected: E, actual: A) {
-        self.with_expected(format!("vec to contain <{:?}>", expected))
-            .with_actual(format!("<{:?}>", actual))
-            .fail();
+    #[test]
+    #[should_panic(expected = "expected vec to have length <1> but was <3>")]
+    fn should_panic_if_vec_length_does_not_match_expected() {
+        let test_vec = vec![1, 2, 3];
+        assert_that(&test_vec).has_length(1);
     }
+
 }

@@ -50,3 +50,36 @@ impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::super::prelude::*;
+
+    #[test]
+    fn should_not_panic_if_result_is_expected_to_be_ok_and_is() {
+        let result: Result<&str, &str> = Ok("Hello");
+        assert_that(&result).is_ok();
+    }
+
+    #[test]
+    #[should_panic(expected = "expected result[ok] but was result[error]<\"Oh no\">")]
+    fn should_panic_if_result_is_expected_to_be_ok_and_is_not() {
+        let result: Result<&str, &str> = Err("Oh no");
+        assert_that(&result).is_ok();
+    }
+
+    #[test]
+    fn should_not_panic_if_result_is_expected_to_be_error_and_is() {
+        let result: Result<&str, &str> = Err("Oh no");
+        assert_that(&result).is_error();
+    }
+
+    #[test]
+    #[should_panic(expected = "expected result[error] but was result[ok]<\"Hello\">")]
+    fn should_panic_if_result_is_expected_to_be_error_and_is_not() {
+        let result: Result<&str, &str> = Ok("Hello");
+        assert_that(&result).is_error();
+    }
+
+}

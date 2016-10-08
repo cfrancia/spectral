@@ -58,3 +58,49 @@ impl<'s> StrSpec for Spec<'s, &'s str> {
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::super::prelude::*;
+
+    #[test]
+    fn should_not_panic_if_str_starts_with_value() {
+        let value = "Hello";
+        assert_that(&value).starts_with(&"H");
+    }
+
+    #[test]
+    #[should_panic(expected = "expected string starting with <\"A\"> but was <\"Hello\">")]
+    fn should_panic_if_str_does_not_start_with_value() {
+        let value = "Hello";
+        assert_that(&value).starts_with(&"A");
+    }
+
+    #[test]
+    fn should_not_panic_if_str_ends_with_value() {
+        let value = "Hello";
+        assert_that(&value).ends_with(&"o");
+    }
+
+    #[test]
+    #[should_panic(expected = "expected string ending with <\"A\"> but was <\"Hello\">")]
+    fn should_panic_if_str_does_not_end_with_value() {
+        let value = "Hello";
+        assert_that(&value).ends_with(&"A");
+    }
+
+    #[test]
+    fn should_not_panic_if_str_contains_value() {
+        let value = "Hello";
+        assert_that(&value).contains(&"l");
+    }
+
+    #[test]
+    #[should_panic(expected = "expected string containing <\"A\"> but was <\"Hello\">")]
+    fn should_panic_if_str_does_not_contain_value() {
+        let value = "Hello";
+        assert_that(&value).contains(&"A");
+    }
+
+}
