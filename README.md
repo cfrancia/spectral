@@ -9,7 +9,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-spectral = "0.1.0"
+spectral = "0.3.0"
 ```
 
 Then add this to your crate:
@@ -99,9 +99,17 @@ As a general note, any type under test will usually need to implement at least `
 #### is_none
 #### contains_value
 
+### Paths
+#### exists
+#### is_file
+#### is_directory
+#### has_file_name
+
 ### Results
 #### is_ok
 #### is_error
+#### is_ok_containing
+#### is_err_containing
 
 ### Strings
 #### starts_with
@@ -110,10 +118,13 @@ As a general note, any type under test will usually need to implement at least `
 
 ### Vectors
 #### has_length
+
+### IntoIterator/Iterator
+#### contains
 #### mapped_contains
+#### equals_iterator
 
 ### IntoIterator
-#### contains
 #### matching_contains
 
 ## How it works
