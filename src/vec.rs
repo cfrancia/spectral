@@ -35,7 +35,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "expected vec to have length <1> but was <3>")]
+    #[should_panic(expected = "\n\texpected: vec to have length <1>\n\t but was: <3>")]
     fn should_panic_if_vec_length_does_not_match_expected() {
         let test_vec = vec![1, 2, 3];
         assert_that(&test_vec).has_length(1);

@@ -233,13 +233,13 @@ impl<'s, S> Spec<'s, S> {
 
         match self.description {
             Some(description) => {
-                panic!(format!("{}: expected {} but was {}",
+                panic!(format!("\n\t{}:\n\texpected: {}\n\t but was: {}\n",
                                description,
                                self.expected.clone().unwrap(),
                                self.actual.clone().unwrap()))
             }
             None => {
-                panic!(format!("expected {} but was {}",
+                panic!(format!("\n\texpected: {}\n\t but was: {}\n",
                                self.expected.clone().unwrap(),
                                self.actual.clone().unwrap()))
             }
@@ -250,8 +250,8 @@ impl<'s, S> Spec<'s, S> {
     /// if present.
     fn fail_with_message(&mut self, message: String) {
         match self.description {
-            Some(description) => panic!(format!("{}: {}", description, message)),
-            None => panic!(message),
+            Some(description) => panic!(format!("\n\t{}:\n\t{}\n", description, message)),
+            None => panic!(format!("\n\t{}", message)),
         }
     }
 }
@@ -358,13 +358,13 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "test condition: expected <2> but was <1>")]
+    #[should_panic(expected = "\n\ttest condition:\n\texpected: <2>\n\t but was: <1>")]
     fn should_contain_assertion_description_in_panic() {
         asserting(&"test condition").that(&1).is_equal_to(&2);
     }
 
     #[test]
-    #[should_panic(expected = "closure: expectation failed for value <\"Hello\">")]
+    #[should_panic(expected = "\n\tclosure:\n\texpectation failed for value <\"Hello\">")]
     fn should_contain_assertion_description_if_message_is_provided() {
         let value = "Hello";
         asserting(&"closure").that(&value).matches(|val| val.eq(&"Hi"));
@@ -376,7 +376,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "expected <2> but was <1>")]
+    #[should_panic(expected = "\n\texpected: <2>\n\t but was: <1>")]
     fn should_panic_on_unequal_subjects() {
         assert_that(&1).is_equal_to(&2);
     }
@@ -388,7 +388,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "expectation failed for value <\"Hello\">")]
+    #[should_panic(expected = "\n\texpectation failed for value <\"Hello\">")]
     fn should_panic_if_value_does_not_match() {
         let value = "Hello";
         assert_that(&value).matches(|val| val.eq(&"Hi"));

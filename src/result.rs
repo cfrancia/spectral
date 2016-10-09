@@ -63,7 +63,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "expected result[ok] but was result[error]<\"Oh no\">")]
+    #[should_panic(expected = "\n\texpected: result[ok]\n\t but was: result[error]<\"Oh no\">")]
     fn should_panic_if_result_is_expected_to_be_ok_and_is_not() {
         let result: Result<&str, &str> = Err("Oh no");
         assert_that(&result).is_ok();
@@ -76,7 +76,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "expected result[error] but was result[ok]<\"Hello\">")]
+    #[should_panic(expected = "\n\texpected: result[error]\n\t but was: result[ok]<\"Hello\">")]
     fn should_panic_if_result_is_expected_to_be_error_and_is_not() {
         let result: Result<&str, &str> = Ok("Hello");
         assert_that(&result).is_error();

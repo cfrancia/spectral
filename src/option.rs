@@ -97,7 +97,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "expected option[some] but was option[none]")]
+    #[should_panic(expected = "\n\texpected: option[some]\n\t but was: option[none]")]
     fn should_panic_if_option_is_expected_to_contain_value_and_does_not() {
         let option: Option<&str> = None;
         assert_that(&option).is_some();
@@ -110,14 +110,14 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "expected option to contain <\"Hi\"> but was <\"Hello\">")]
+    #[should_panic(expected = "\n\texpected: option to contain <\"Hi\">\n\t but was: <\"Hello\">")]
     fn should_panic_if_option_does_not_contain_expected_value() {
         let option = Some("Hello");
         assert_that(&option).contains_value(&"Hi");
     }
 
     #[test]
-    #[should_panic(expected = "expected option<\"Hello\"> but was option[none]")]
+    #[should_panic(expected = "\n\texpected: option<\"Hello\">\n\t but was: option[none]")]
     fn should_panic_if_option_is_none_but_expected_value() {
         let option: Option<&str> = None;
         assert_that(&option).contains_value(&"Hello");
@@ -130,7 +130,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "expected option[none] but was option<\"Hello\"")]
+    #[should_panic(expected = "\n\texpected: option[none]\n\t but was: option<\"Hello\"")]
     fn should_panic_if_option_is_not_empty_but_was_expected_as_empty() {
         let option = Some("Hello");
         assert_that(&option).is_none();
