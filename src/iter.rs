@@ -3,21 +3,20 @@ use super::Spec;
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
-pub trait ContainingIntoIterSpec<'s, T: 's>
-    where T: Debug + PartialEq
-{
-    fn contains(&mut self, expected_value: &'s T) -> &mut Self;
-    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
-        where E: Iterator<Item = &'s T> + Clone;
+macro_rules! generate_iter_spec_trait {
+    ($trait_name:ident) => {
+        pub trait $trait_name<'s, T: 's>
+            where T: Debug + PartialEq
+            {
+                fn contains(&mut self, expected_value: &'s T) -> &mut Self;
+                fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
+                    where E: Iterator<Item = &'s T> + Clone;
+            }
+    }
 }
 
-pub trait ContainingIteratorSpec<'s, T: 's>
-    where T: Debug + PartialEq
-{
-    fn contains(&mut self, expected_value: &'s T) -> &mut Self;
-    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
-        where E: Iterator<Item = &'s T> + Clone;
-}
+generate_iter_spec_trait!(ContainingIntoIterSpec);
+generate_iter_spec_trait!(ContainingIteratorSpec);
 
 pub trait MappingIterSpec<'s, T: 's>
     where T: Debug
