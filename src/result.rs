@@ -22,6 +22,12 @@ impl<'s, T, E> ContainingResultSpec<T, E> for Spec<'s, Result<T, E>>
     where T: Debug + PartialEq,
           E: Debug + PartialEq
 {
+    /// Asserts that the subject is an `Ok` Result containing the expected value. The subject type must
+    /// be a `Result`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&Result::Ok::<usize, usize>(1)).is_ok_containing(&1);
+    /// ```
     fn is_ok_containing(&mut self, expected_value: &T) -> &mut Self {
         match self.subject {
             &Ok(ref val) => {
@@ -41,6 +47,12 @@ impl<'s, T, E> ContainingResultSpec<T, E> for Spec<'s, Result<T, E>>
         self
     }
 
+    /// Asserts that the subject is an `Err` Result containing the expected value. The subject type must
+    /// be a `Result`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&Result::Err::<usize, usize>(1)).is_err_containing(&1);
+    /// ```
     fn is_err_containing(&mut self, expected_value: &E) -> &mut Self {
         match self.subject {
             &Err(ref val) => {
