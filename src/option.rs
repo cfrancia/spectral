@@ -10,13 +10,13 @@ pub trait OptionSpec<T>
     fn is_none(&mut self) -> &mut Self;
 }
 
-pub trait ComparingOptionSpec<T>
+pub trait ContainingOptionSpec<T>
     where T: Debug + PartialEq
 {
     fn contains_value(&mut self, expected_value: &T) -> &mut Self;
 }
 
-impl<'s, T> ComparingOptionSpec<T> for Spec<'s, Option<T>>
+impl<'s, T> ContainingOptionSpec<T> for Spec<'s, Option<T>>
     where T: Debug + PartialEq
 {
     /// Asserts that the subject is a `Some` containing the expected value. The subject type must

@@ -3,27 +3,32 @@ use super::Spec;
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
-pub trait ComparingIterSpec<'s, T: 's>
+pub trait ContainingIntoIterSpec<'s, T: 's>
     where T: Debug + PartialEq
 {
-    fn contains(&mut self, expected_value: &T) -> &mut Self;
+    fn contains(&mut self, expected_value: &'s T) -> &mut Self;
+    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
+        where E: Iterator<Item = &'s T> + Clone;
 }
 
-pub trait MatchingIterSpec<'s, T: 's>
+pub trait ContainingIteratorSpec<'s, T: 's>
+    where T: Debug + PartialEq
+{
+    fn contains(&mut self, expected_value: &'s T) -> &mut Self;
+    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
+        where E: Iterator<Item = &'s T> + Clone;
+}
+
+pub trait MappingIterSpec<'s, T: 's>
     where T: Debug
 {
     fn matching_contains<F>(&mut self, matcher: F) -> &mut Self where F: Fn(&'s T) -> bool;
-}
-
-pub trait MappingComparingIterSpec<'s, T: 's>
-    where T: Debug
-{
     fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M) -> &mut Self
         where M: Debug + PartialEq,
               F: Fn(&'s T) -> M;
 }
 
-impl<'s, T: 's, I> ComparingIterSpec<'s, T> for Spec<'s, I>
+impl<'s, T: 's, I> ContainingIntoIterSpec<'s, T> for Spec<'s, I>
     where T: Debug + PartialEq,
           &'s I: IntoIterator<Item = &'s T>
 {
@@ -34,22 +39,68 @@ impl<'s, T: 's, I> ComparingIterSpec<'s, T> for Spec<'s, I>
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec).contains(&2);
     /// ```
-    fn contains(&mut self, expected_value: &T) -> &mut Self {
-        let mut actual = Vec::new();
-        for x in self.subject {
-            if expected_value.eq(x) {
-                return self;
-            } else {
-                actual.push(x);
-            }
-        }
+    fn contains(&mut self, expected_value: &'s T) -> &mut Self {
+        let subject_iter = self.subject.into_iter();
+        check_iterator_contains(self, subject_iter, &expected_value);
 
-        panic_unmatched(self, expected_value, actual);
-        unreachable!();
+        self
+    }
+
+    /// Asserts that the subject is equal to provided iterator. The subject must implement
+    /// `IntoIterator`, the contained type must implement `PartialEq` and `Debug` and the expected
+    /// value must implement Iterator and Clone.
+    ///
+    /// ```rust,ignore
+    /// let expected_vec = vec![1,2,3];
+    /// let test_vec = vec![1,2,3];
+    /// assert_that(&test_vec).equals_iterator(&expected_vec.iter());
+    /// ```
+    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
+        where E: Iterator<Item = &'s T> + Clone
+    {
+        compare_iterators(self, self.subject.into_iter(), expected_iter.clone());
+
+        self
     }
 }
 
-impl<'s, T: 's, I> MappingComparingIterSpec<'s, T> for Spec<'s, I>
+impl<'s, T: 's, I> ContainingIteratorSpec<'s, T> for Spec<'s, I>
+    where T: Debug + PartialEq,
+          I: Iterator<Item = &'s T> + Clone
+{
+    /// Asserts that the iterable subject contains the provided value. The subject must implement
+    /// `Iterator`, and the contained type must implement `PartialEq` and `Debug`.
+    ///
+    /// ```rust,ignore
+    /// let test_vec = vec![1,2,3];
+    /// assert_that(&test_vec.iter()).contains(&2);
+    /// ```
+    fn contains(&mut self, expected_value: &'s T) -> &mut Self {
+        let subject_iter = self.subject.clone();
+        check_iterator_contains(self, subject_iter, &expected_value);
+
+        self
+    }
+
+    /// Asserts that the iterable subject is equal to provided iterator. The subject must implement
+    /// `Iterator`, the contained type must implement `PartialEq` and `Debug` and the expected
+    /// value must implement Iterator and Clone.
+    ///
+    /// ```rust,ignore
+    /// let expected_vec = vec![1,2,3];
+    /// let test_vec = vec![1,2,3];
+    /// assert_that(&test_vec.iter()).equals_iterator(&expected_vec.iter());
+    /// ```
+    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
+        where E: Iterator<Item = &'s T> + Clone
+    {
+        compare_iterators(self, self.subject.clone(), expected_iter.clone());
+
+        self
+    }
+}
+
+impl<'s, T: 's, I> MappingIterSpec<'s, T> for Spec<'s, I>
     where T: Debug,
           &'s I: IntoIterator<Item = &'s T>
 {
@@ -84,12 +135,7 @@ impl<'s, T: 's, I> MappingComparingIterSpec<'s, T> for Spec<'s, I>
         panic_unmatched(self, expected_value, mapped_vec);
         unreachable!();
     }
-}
 
-impl<'s, T: 's, I> MatchingIterSpec<'s, T> for Spec<'s, I>
-    where T: Debug,
-          &'s I: IntoIterator<Item = &'s T>
-{
     /// Asserts that the subject contains a matching item by using the provided function.
     /// The subject must implement `IntoIterator`, and the contained type must implement `Debug`.
     ///
@@ -124,6 +170,77 @@ impl<'s, T: 's, I> MatchingIterSpec<'s, T> for Spec<'s, I>
     }
 }
 
+fn check_iterator_contains<T, V, I>(spec: &mut Spec<T>, actual_iter: I, expected_value: &V)
+    where V: PartialEq + Debug,
+          I: Iterator<Item = V>
+{
+    let mut actual = Vec::new();
+
+    for x in actual_iter {
+        if expected_value.eq(&x) {
+            return;
+        } else {
+            actual.push(x);
+        }
+    }
+
+    panic_unmatched(spec, expected_value, actual);
+}
+
+fn compare_iterators<T, V, I, E>(spec: &mut Spec<T>, actual_iter: I, expected_iter: E)
+    where V: PartialEq + Debug,
+          I: Iterator<Item = V>,
+          E: Iterator<Item = V>
+{
+    let mut actual_iter = actual_iter;
+    let mut expected_iter = expected_iter;
+
+    let mut read_subject = vec![];
+    let mut read_expected = vec![];
+
+    loop {
+        match (actual_iter.next(), expected_iter.next()) {
+            (Some(actual), Some(expected)) => {
+                if !&actual.eq(&expected) {
+                    spec.with_expected(format!("Iterator item of <{:?}> (read <{:?}>)",
+                                               expected,
+                                               read_expected))
+                        .with_actual(format!("Iterator item of <{:?}> (read <{:?}>)",
+                                             actual,
+                                             read_subject))
+                        .fail();
+
+                    unreachable!();
+                }
+
+                read_subject.push(actual);
+                read_expected.push(expected);
+            }
+            (Some(actual), None) => {
+                spec.with_expected(format!("Completed iterator (read <{:?}>)", read_expected))
+                    .with_actual(format!("Iterator item of <{:?}> (read <{:?}>",
+                                         actual,
+                                         read_subject))
+                    .fail();
+
+                unreachable!();
+            }
+            (None, Some(expected)) => {
+                spec.with_expected(format!("Iterator item of <{:?}> (read <{:?}>",
+                                           expected,
+                                           read_expected))
+                    .with_actual(format!("Completed iterator (read <{:?}>", read_subject))
+                    .fail();
+
+                unreachable!();
+            }
+            (None, None) => {
+                break;
+            }
+        }
+    }
+}
+
 fn panic_unmatched<T, E: Debug, A: Debug>(spec: &mut Spec<T>, expected: E, actual: A) {
     spec.with_expected(format!("iterator to contain <{:?}>", expected))
         .with_actual(format!("<{:?}>", actual))
@@ -150,7 +267,7 @@ mod tests {
     }
 
     #[test]
-    fn should_not_panic_if_iterator_contains_value() {
+    fn should_not_panic_if_iterable_contains_value() {
         let mut test_into_iter = LinkedList::new();
         test_into_iter.push_back(1);
         test_into_iter.push_back(2);
@@ -161,13 +278,62 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "expected iterator to contain <5> but was <[1, 2, 3]>")]
-    fn should_panic_if_iterator_does_not_contain_value() {
+    fn should_panic_if_iterable_does_not_contain_value() {
         let mut test_into_iter = LinkedList::new();
         test_into_iter.push_back(1);
         test_into_iter.push_back(2);
         test_into_iter.push_back(3);
 
         assert_that(&test_into_iter).contains(&5);
+    }
+
+    #[test]
+    fn should_not_panic_if_iteratable_equals_expected_iterator() {
+        let expected_vec = vec![1, 2, 3];
+        let test_vec = vec![1, 2, 3];
+
+        assert_that(&test_vec).equals_iterator(&expected_vec.iter());
+    }
+
+    #[test]
+    #[should_panic(expected = "expected Iterator item of <4> (read <[1, 2]>) \
+                   but was Iterator item of <3> (read <[1, 2]>)")]
+    fn should_panic_if_iteratable_does_not_equal_expected_iterator() {
+        let expected_vec = vec![1, 2, 4];
+        let test_vec = vec![1, 2, 3];
+
+        assert_that(&test_vec).equals_iterator(&expected_vec.iter());
+    }
+
+    #[test]
+    fn should_not_panic_if_iterator_contains_value() {
+        let test_vec = vec![1, 2, 3];
+        assert_that(&test_vec.iter()).contains(&2);
+    }
+
+    #[test]
+    #[should_panic(expected = "expected iterator to contain <5> but was <[1, 2, 3]>")]
+    fn should_panic_if_iterator_does_not_contain_value() {
+        let test_vec = vec![1, 2, 3];
+        assert_that(&test_vec.iter()).contains(&5);
+    }
+
+    #[test]
+    fn should_not_panic_if_iterator_equals_expected_iterator() {
+        let expected_vec = vec![1, 2, 3];
+        let test_vec = vec![1, 2, 3];
+
+        assert_that(&test_vec.iter()).equals_iterator(&expected_vec.iter());
+    }
+
+    #[test]
+    #[should_panic(expected = "expected Iterator item of <4> (read <[1, 2]>) \
+                   but was Iterator item of <3> (read <[1, 2]>)")]
+    fn should_panic_if_iterator_does_not_equal_expected_iterator() {
+        let expected_vec = vec![1, 2, 4];
+        let test_vec = vec![1, 2, 3];
+
+        assert_that(&test_vec.iter()).equals_iterator(&expected_vec.iter());
     }
 
     #[test]
