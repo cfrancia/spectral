@@ -14,7 +14,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! spectral = "0.2.0"
+//! spectral = "0.3.0"
 //! ```
 //!
 //! Then add this to your crate:
