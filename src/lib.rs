@@ -146,6 +146,7 @@ use colours::{TERM_RED, TERM_BOLD, TERM_RESET};
 
 pub mod numeric;
 pub mod option;
+pub mod path;
 pub mod prelude;
 pub mod result;
 pub mod string;
