@@ -10,6 +10,61 @@ pub trait ResultSpec<T, E>
     fn is_error(&mut self) -> &mut Self;
 }
 
+pub trait ContainingResultSpec<T, E>
+    where T: Debug + PartialEq,
+          E: Debug + PartialEq
+{
+    fn is_ok_containing(&mut self, expected_value: &T) -> &mut Self;
+    fn is_err_containing(&mut self, expected_value: &E) -> &mut Self;
+}
+
+impl<'s, T, E> ContainingResultSpec<T, E> for Spec<'s, Result<T, E>>
+    where T: Debug + PartialEq,
+          E: Debug + PartialEq
+{
+    fn is_ok_containing(&mut self, expected_value: &T) -> &mut Self {
+        match self.subject {
+            &Ok(ref val) => {
+                if !val.eq(expected_value) {
+                    self.with_expected(build_detail_message("ok", expected_value))
+                        .with_actual(build_detail_message("ok", val))
+                        .fail();
+                }
+            }
+            &Err(ref val) => {
+                self.with_expected(build_detail_message("ok", expected_value))
+                    .with_actual(build_detail_message("err", val))
+                    .fail();
+            }
+        }
+
+        self
+    }
+
+    fn is_err_containing(&mut self, expected_value: &E) -> &mut Self {
+        match self.subject {
+            &Err(ref val) => {
+                if !val.eq(expected_value) {
+                    self.with_expected(build_detail_message("err", expected_value))
+                        .with_actual(build_detail_message("err", val))
+                        .fail();
+                }
+            }
+            &Ok(ref val) => {
+                self.with_expected(build_detail_message("err", expected_value))
+                    .with_actual(build_detail_message("ok", val))
+                    .fail();
+            }
+        }
+
+        self
+    }
+}
+
+fn build_detail_message<T: Debug>(variant: &'static str, value: T) -> String {
+    format!("Result[{}] containing <{:?}>", variant, value)
+}
+
 impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
     where T: Debug,
           E: Debug
@@ -80,6 +135,50 @@ mod tests {
     fn should_panic_if_result_is_expected_to_be_error_and_is_not() {
         let result: Result<&str, &str> = Ok("Hello");
         assert_that(&result).is_error();
+    }
+
+    #[test]
+    fn should_not_panic_if_result_is_ok_with_expected_value() {
+        let result: Result<&str, &str> = Ok("Hello");
+        assert_that(&result).is_ok_containing(&"Hello");
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: Result[ok] containing <\"Hi\">\
+                   \n\t but was: Result[ok] containing <\"Hello\">")]
+    fn should_panic_if_result_is_ok_without_expected_value() {
+        let result: Result<&str, &str> = Ok("Hello");
+        assert_that(&result).is_ok_containing(&"Hi");
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: Result[ok] containing <\"Hi\">\
+                   \n\t but was: Result[err] containing <\"Hi\">")]
+    fn should_panic_if_result_is_err_if_ok_with_value_expected() {
+        let result: Result<&str, &str> = Err("Hi");
+        assert_that(&result).is_ok_containing(&"Hi");
+    }
+
+    #[test]
+    fn should_not_panic_if_result_is_err_with_expected_value() {
+        let result: Result<&str, &str> = Err("Oh no");
+        assert_that(&result).is_err_containing(&"Oh no");
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: Result[err] containing <\"Oh no\">\
+                   \n\t but was: Result[err] containing <\"Whoops\">")]
+    fn should_panic_if_result_is_err_without_expected_value() {
+        let result: Result<&str, &str> = Err("Whoops");
+        assert_that(&result).is_err_containing(&"Oh no");
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: Result[err] containing <\"Oh no\">\
+                   \n\t but was: Result[ok] containing <\"Oh no\">")]
+    fn should_panic_if_result_is_ok_if_err_with_value_expected() {
+        let result: Result<&str, &str> = Ok("Oh no");
+        assert_that(&result).is_err_containing(&"Oh no");
     }
 
 }
