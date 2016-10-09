@@ -142,6 +142,8 @@
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
+use colours::{TERM_RED, TERM_BOLD, TERM_RESET};
+
 pub mod numeric;
 pub mod option;
 pub mod prelude;
@@ -149,6 +151,22 @@ pub mod result;
 pub mod string;
 pub mod vec;
 pub mod iter;
+
+// Disable colours during tests, otherwise trying to assert on the panic message becomes
+// significantly more annoying.
+#[cfg(not(test))]
+mod colours {
+    pub const TERM_RED: &'static str = "\x1B[31m";
+    pub const TERM_BOLD: &'static str = "\x1B[1m";
+    pub const TERM_RESET: &'static str = "\x1B[0m";
+}
+
+#[cfg(test)]
+mod colours {
+    pub const TERM_RED: &'static str = "";
+    pub const TERM_BOLD: &'static str = "";
+    pub const TERM_RESET: &'static str = "";
+}
 
 #[macro_export]
 macro_rules! assert_that {
@@ -233,15 +251,21 @@ impl<'s, S> Spec<'s, S> {
 
         match self.description {
             Some(description) => {
-                panic!(format!("\n\t{}:\n\texpected: {}\n\t but was: {}\n",
+                panic!(format!("\n\t{}{}:{}\n\t{}expected: {}\n\t but was: {}{}\n",
+                               TERM_BOLD,
                                description,
+                               TERM_RESET,
+                               TERM_RED,
                                self.expected.clone().unwrap(),
-                               self.actual.clone().unwrap()))
+                               self.actual.clone().unwrap(),
+                               TERM_RESET))
             }
             None => {
-                panic!(format!("\n\texpected: {}\n\t but was: {}\n",
+                panic!(format!("\n\t{}expected: {}\n\t but was: {}{}\n",
+                               TERM_RED,
                                self.expected.clone().unwrap(),
-                               self.actual.clone().unwrap()))
+                               self.actual.clone().unwrap(),
+                               TERM_RESET))
             }
         }
     }
@@ -250,8 +274,16 @@ impl<'s, S> Spec<'s, S> {
     /// if present.
     fn fail_with_message(&mut self, message: String) {
         match self.description {
-            Some(description) => panic!(format!("\n\t{}:\n\t{}\n", description, message)),
-            None => panic!(format!("\n\t{}", message)),
+            Some(description) => {
+                panic!(format!("\n\t{}{}:{}\n\t{}{}{}\n",
+                               TERM_BOLD,
+                               description,
+                               TERM_RESET,
+                               TERM_RED,
+                               message,
+                               TERM_RESET))
+            }
+            None => panic!(format!("\n\t{}{}{}\n", TERM_RED, message, TERM_RESET)),
         }
     }
 }
