@@ -2,7 +2,7 @@ use super::{AssertionFailure, Spec};
 
 use std::fmt::Debug;
 
-pub trait ResultSpec<T, E>
+pub trait ResultAssertions<T, E>
     where T: Debug,
           E: Debug
 {
@@ -10,7 +10,7 @@ pub trait ResultSpec<T, E>
     fn is_error(&mut self) -> &mut Self;
 }
 
-pub trait ContainingResultSpec<T, E>
+pub trait ContainingResultAssertions<T, E>
     where T: Debug + PartialEq,
           E: Debug + PartialEq
 {
@@ -18,7 +18,7 @@ pub trait ContainingResultSpec<T, E>
     fn is_err_containing(&mut self, expected_value: &E) -> &mut Self;
 }
 
-impl<'s, T, E> ContainingResultSpec<T, E> for Spec<'s, Result<T, E>>
+impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
     where T: Debug + PartialEq,
           E: Debug + PartialEq
 {
@@ -81,7 +81,7 @@ fn build_detail_message<T: Debug>(variant: &'static str, value: T) -> String {
     format!("Result[{}] containing <{:?}>", variant, value)
 }
 
-impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
+impl<'s, T, E> ResultAssertions<T, E> for Spec<'s, Result<T, E>>
     where T: Debug,
           E: Debug
 {

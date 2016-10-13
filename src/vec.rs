@@ -1,10 +1,10 @@
 use super::{AssertionFailure, Spec};
 
-pub trait VecSpec {
+pub trait VecAssertions {
     fn has_length(&mut self, expected: usize) -> &mut Self;
 }
 
-impl<'s, T> VecSpec for Spec<'s, Vec<T>> {
+impl<'s, T> VecAssertions for Spec<'s, Vec<T>> {
     /// Asserts that the length of the subject vector is equal to the provided length. The subject
     /// type must be of `Vec`.
     ///

@@ -1,12 +1,12 @@
 use super::{AssertionFailure, Spec};
 
-pub trait StrSpec {
+pub trait StrAssertions {
     fn starts_with(&mut self, expected: &str) -> &mut Self;
     fn ends_with(&mut self, expected: &str) -> &mut Self;
     fn contains(&mut self, expected: &str) -> &mut Self;
 }
 
-impl<'s> StrSpec for Spec<'s, &'s str> {
+impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// Asserts that the subject `&str` starts with the provided `&str`.
     ///
     /// ```rust,ignore

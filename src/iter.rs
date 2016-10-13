@@ -15,10 +15,10 @@ macro_rules! generate_iter_spec_trait {
     }
 }
 
-generate_iter_spec_trait!(ContainingIntoIterSpec);
-generate_iter_spec_trait!(ContainingIteratorSpec);
+generate_iter_spec_trait!(ContainingIntoIterAssertions);
+generate_iter_spec_trait!(ContainingIteratorAssertions);
 
-pub trait MappingIterSpec<'s, T: 's>
+pub trait MappingIterAssertions<'s, T: 's>
     where T: Debug
 {
     fn matching_contains<F>(&mut self, matcher: F) -> &mut Self where F: Fn(&'s T) -> bool;
@@ -27,7 +27,7 @@ pub trait MappingIterSpec<'s, T: 's>
               F: Fn(&'s T) -> M;
 }
 
-impl<'s, T: 's, I> ContainingIntoIterSpec<'s, T> for Spec<'s, I>
+impl<'s, T: 's, I> ContainingIntoIterAssertions<'s, T> for Spec<'s, I>
     where T: Debug + PartialEq,
           &'s I: IntoIterator<Item = &'s T>
 {
@@ -63,7 +63,7 @@ impl<'s, T: 's, I> ContainingIntoIterSpec<'s, T> for Spec<'s, I>
     }
 }
 
-impl<'s, T: 's, I> ContainingIteratorSpec<'s, T> for Spec<'s, I>
+impl<'s, T: 's, I> ContainingIteratorAssertions<'s, T> for Spec<'s, I>
     where T: Debug + PartialEq,
           I: Iterator<Item = &'s T> + Clone
 {
@@ -99,7 +99,7 @@ impl<'s, T: 's, I> ContainingIteratorSpec<'s, T> for Spec<'s, I>
     }
 }
 
-impl<'s, T: 's, I> MappingIterSpec<'s, T> for Spec<'s, I>
+impl<'s, T: 's, I> MappingIterAssertions<'s, T> for Spec<'s, I>
     where T: Debug,
           &'s I: IntoIterator<Item = &'s T>
 {

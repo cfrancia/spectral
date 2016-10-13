@@ -3,7 +3,7 @@ use super::{AssertionFailure, Spec};
 use std::fmt::Debug;
 use std::cmp::PartialOrd;
 
-pub trait OrderedSpec<T>
+pub trait OrderedAssertions<T>
     where T: Debug + PartialOrd
 {
     fn is_less_than(&mut self, other: &T) -> &mut Self;
@@ -12,7 +12,7 @@ pub trait OrderedSpec<T>
     fn is_greater_than_or_equal_to(&mut self, other: &T) -> &mut Self;
 }
 
-impl<'s, T> OrderedSpec<T> for Spec<'s, T>
+impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
     where T: Debug + PartialOrd
 {
     /// Asserts that the subject is less than the expected value. The subject type must

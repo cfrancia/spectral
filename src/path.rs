@@ -2,14 +2,14 @@ use super::{AssertionFailure, Spec};
 
 use std::path::Path;
 
-pub trait PathSpec {
+pub trait PathAssertions {
     fn exists(&mut self) -> &mut Self;
     fn is_a_file(&mut self) -> &mut Self;
     fn is_a_directory(&mut self) -> &mut Self;
     fn has_file_name(&mut self, expected_file_name: &str) -> &mut Self;
 }
 
-impl<'s> PathSpec for Spec<'s, &'s Path> {
+impl<'s> PathAssertions for Spec<'s, &'s Path> {
     /// Asserts that the subject `Path` refers to an existing location.
     ///
     /// ```rust,ignore

@@ -3,20 +3,20 @@ use super::{AssertionFailure, Spec};
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
-pub trait OptionSpec<T>
+pub trait OptionAssertions<T>
     where T: Debug
 {
     fn is_some(&mut self) -> &mut Self;
     fn is_none(&mut self) -> &mut Self;
 }
 
-pub trait ContainingOptionSpec<T>
+pub trait ContainingOptionAssertions<T>
     where T: Debug + PartialEq
 {
     fn contains_value(&mut self, expected_value: &T) -> &mut Self;
 }
 
-impl<'s, T> ContainingOptionSpec<T> for Spec<'s, Option<T>>
+impl<'s, T> ContainingOptionAssertions<T> for Spec<'s, Option<T>>
     where T: Debug + PartialEq
 {
     /// Asserts that the subject is a `Some` containing the expected value. The subject type must
@@ -47,7 +47,7 @@ impl<'s, T> ContainingOptionSpec<T> for Spec<'s, Option<T>>
     }
 }
 
-impl<'s, T> OptionSpec<T> for Spec<'s, Option<T>>
+impl<'s, T> OptionAssertions<T> for Spec<'s, Option<T>>
     where T: Debug
 {
     /// Asserts that the subject is `Some`. The subject type must be an `Option`.
