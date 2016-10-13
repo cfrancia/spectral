@@ -1,4 +1,4 @@
-use super::Spec;
+use super::{AssertionFailure, Spec};
 
 pub trait StrSpec {
     fn starts_with(&mut self, expected: &str) -> &mut Self;
@@ -16,7 +16,8 @@ impl<'s> StrSpec for Spec<'s, &'s str> {
         let subject = self.subject;
 
         if !subject.starts_with(expected) {
-            self.with_expected(format!("string starting with <{:?}>", expected))
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("string starting with <{:?}>", expected))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -33,7 +34,8 @@ impl<'s> StrSpec for Spec<'s, &'s str> {
         let subject = self.subject;
 
         if !subject.ends_with(expected) {
-            self.with_expected(format!("string ending with <{:?}>", expected))
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("string ending with <{:?}>", expected))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -50,7 +52,8 @@ impl<'s> StrSpec for Spec<'s, &'s str> {
         let subject = self.subject;
 
         if !subject.contains(expected) {
-            self.with_expected(format!("string containing <{:?}>", expected))
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("string containing <{:?}>", expected))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }

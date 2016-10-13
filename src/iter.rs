@@ -1,4 +1,4 @@
-use super::Spec;
+use super::{AssertionFailure, Spec};
 
 use std::cmp::PartialEq;
 use std::fmt::Debug;
@@ -162,7 +162,8 @@ impl<'s, T: 's, I> MappingIterSpec<'s, T> for Spec<'s, I>
                 actual.push(x);
             }
         }
-        self.fail_with_message(format!("expectation failed for iterator with values <{:?}>",
+        AssertionFailure::from_spec(self)
+            .fail_with_message(format!("expectation failed for iterator with values <{:?}>",
                                        actual));
 
         unreachable!();
@@ -201,7 +202,8 @@ fn compare_iterators<T, V, I, E>(spec: &mut Spec<T>, actual_iter: I, expected_it
         match (actual_iter.next(), expected_iter.next()) {
             (Some(actual), Some(expected)) => {
                 if !&actual.eq(&expected) {
-                    spec.with_expected(format!("Iterator item of <{:?}> (read <{:?}>)",
+                    AssertionFailure::from_spec(spec)
+                        .with_expected(format!("Iterator item of <{:?}> (read <{:?}>)",
                                                expected,
                                                read_expected))
                         .with_actual(format!("Iterator item of <{:?}> (read <{:?}>)",
@@ -216,7 +218,8 @@ fn compare_iterators<T, V, I, E>(spec: &mut Spec<T>, actual_iter: I, expected_it
                 read_expected.push(expected);
             }
             (Some(actual), None) => {
-                spec.with_expected(format!("Completed iterator (read <{:?}>)", read_expected))
+                AssertionFailure::from_spec(spec)
+                    .with_expected(format!("Completed iterator (read <{:?}>)", read_expected))
                     .with_actual(format!("Iterator item of <{:?}> (read <{:?}>",
                                          actual,
                                          read_subject))
@@ -225,7 +228,8 @@ fn compare_iterators<T, V, I, E>(spec: &mut Spec<T>, actual_iter: I, expected_it
                 unreachable!();
             }
             (None, Some(expected)) => {
-                spec.with_expected(format!("Iterator item of <{:?}> (read <{:?}>",
+                AssertionFailure::from_spec(spec)
+                    .with_expected(format!("Iterator item of <{:?}> (read <{:?}>",
                                            expected,
                                            read_expected))
                     .with_actual(format!("Completed iterator (read <{:?}>", read_subject))
@@ -241,7 +245,8 @@ fn compare_iterators<T, V, I, E>(spec: &mut Spec<T>, actual_iter: I, expected_it
 }
 
 fn panic_unmatched<T, E: Debug, A: Debug>(spec: &mut Spec<T>, expected: E, actual: A) {
-    spec.with_expected(format!("iterator to contain <{:?}>", expected))
+    AssertionFailure::from_spec(spec)
+        .with_expected(format!("iterator to contain <{:?}>", expected))
         .with_actual(format!("<{:?}>", actual))
         .fail();
 }

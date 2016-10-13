@@ -1,4 +1,4 @@
-use super::Spec;
+use super::{AssertionFailure, Spec};
 
 use std::cmp::PartialEq;
 use std::fmt::Debug;
@@ -29,13 +29,15 @@ impl<'s, T> ContainingOptionSpec<T> for Spec<'s, Option<T>>
         match self.subject {
             &Some(ref val) => {
                 if !val.eq(expected_value) {
-                    self.with_expected(format!("option to contain <{:?}>", expected_value))
+                    AssertionFailure::from_spec(self)
+                        .with_expected(format!("option to contain <{:?}>", expected_value))
                         .with_actual(format!("<{:?}>", val))
                         .fail();
                 }
             }
             &None => {
-                self.with_expected(format!("option<{:?}>", expected_value))
+                AssertionFailure::from_spec(self)
+                    .with_expected(format!("option<{:?}>", expected_value))
                     .with_actual(format!("option[none]"))
                     .fail();
             }
@@ -57,7 +59,8 @@ impl<'s, T> OptionSpec<T> for Spec<'s, Option<T>>
         match self.subject {
             &Some(_) => (),
             &None => {
-                self.with_expected(format!("option[some]"))
+                AssertionFailure::from_spec(self)
+                    .with_expected(format!("option[some]"))
                     .with_actual(format!("option[none]"))
                     .fail();
             }
@@ -75,7 +78,8 @@ impl<'s, T> OptionSpec<T> for Spec<'s, Option<T>>
         match self.subject {
             &None => (),
             &Some(ref val) => {
-                self.with_expected(format!("option[none]"))
+                AssertionFailure::from_spec(self)
+                    .with_expected(format!("option[none]"))
                     .with_actual(format!("option<{:?}>", val))
                     .fail();
             }

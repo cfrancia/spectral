@@ -1,4 +1,4 @@
-use super::Spec;
+use super::{AssertionFailure, Spec};
 
 use std::path::Path;
 
@@ -18,7 +18,8 @@ impl<'s> PathSpec for Spec<'s, &'s Path> {
     fn exists(&mut self) -> &mut Self {
         let subject = self.subject;
         if !self.subject.exists() {
-            self.with_expected(format!("Path of <{:?}> to exist", subject))
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("Path of <{:?}> to exist", subject))
                 .with_actual(format!("a non-existent Path"))
                 .fail();
         }
@@ -34,7 +35,8 @@ impl<'s> PathSpec for Spec<'s, &'s Path> {
     fn is_a_file(&mut self) -> &mut Self {
         let subject = self.subject;
         if !self.subject.is_file() {
-            self.with_expected(format!("Path of <{:?}> to be a file", subject))
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("Path of <{:?}> to be a file", subject))
                 .with_actual(format!("not a resolvable file"))
                 .fail();
         }
@@ -50,7 +52,8 @@ impl<'s> PathSpec for Spec<'s, &'s Path> {
     fn is_a_directory(&mut self) -> &mut Self {
         let subject = self.subject;
         if !self.subject.is_dir() {
-            self.with_expected(format!("Path of <{:?}> to be a directory", subject))
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("Path of <{:?}> to be a directory", subject))
                 .with_actual(format!("not a resolvable directory"))
                 .fail();
         }
@@ -71,7 +74,8 @@ impl<'s> PathSpec for Spec<'s, &'s Path> {
                 match os_string.to_str() {
                     Some(val) => val,
                     None => {
-                        self.with_expected(build_file_name_message(expected_file_name))
+                        AssertionFailure::from_spec(self)
+                            .with_expected(build_file_name_message(expected_file_name))
                             .with_actual(format!("an invalid UTF-8 file name"))
                             .fail();
 
@@ -80,7 +84,8 @@ impl<'s> PathSpec for Spec<'s, &'s Path> {
                 }
             }
             None => {
-                self.with_expected(build_file_name_message(expected_file_name))
+                AssertionFailure::from_spec(self)
+                    .with_expected(build_file_name_message(expected_file_name))
                     .with_actual(format!("a non-resolvable path <{:?}>", subject))
                     .fail();
 
@@ -89,7 +94,8 @@ impl<'s> PathSpec for Spec<'s, &'s Path> {
         };
 
         if !subject_file_name.eq(expected_file_name) {
-            self.with_expected(build_file_name_message(expected_file_name))
+            AssertionFailure::from_spec(self)
+                .with_expected(build_file_name_message(expected_file_name))
                 .with_actual(format!("<{}>", subject_file_name))
                 .fail();
         }

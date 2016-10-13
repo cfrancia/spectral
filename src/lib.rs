@@ -179,6 +179,20 @@ macro_rules! assert_that {
     };
 }
 
+pub trait DescriptiveSpec<'r> {
+    fn description(&self) -> Option<&'r str>;
+}
+
+/// A failed assertion.
+///
+/// This exposes builder methods to construct the final failure message.
+#[derive(Debug)]
+pub struct AssertionFailure<'r> {
+    description: Option<&'r str>,
+    expected: Option<String>,
+    actual: Option<String>,
+}
+
 /// A description for an assertion.
 ///
 /// This is created by the `asserting` function.
@@ -194,9 +208,7 @@ pub struct SpecDescription<'r> {
 #[derive(Debug)]
 pub struct Spec<'s, S: 's> {
     pub subject: &'s S,
-    description: Option<&'s str>,
-    expected: Option<String>,
-    actual: Option<String>,
+    pub description: Option<&'s str>,
 }
 
 /// Wraps a subject in a `Spec` to provide assertions against it.
@@ -206,8 +218,6 @@ pub fn assert_that<'s, S>(subject: &'s S) -> Spec<'s, S> {
     Spec {
         subject: subject,
         description: None,
-        expected: None,
-        actual: None,
     }
 }
 
@@ -222,25 +232,40 @@ impl<'r> SpecDescription<'r> {
         Spec {
             subject: subject,
             description: Some(self.value),
-            expected: None,
-            actual: None,
         }
     }
 }
 
-impl<'s, S> Spec<'s, S> {
+impl<'r, T> DescriptiveSpec<'r> for Spec<'r, T> {
+    fn description(&self) -> Option<&'r str> {
+        self.description
+    }
+}
+
+impl<'r> AssertionFailure<'r> {
+    /// Construct a new AssertionFailure from a DescriptiveSpec.
+    pub fn from_spec<T: DescriptiveSpec<'r>>(spec: &T) -> AssertionFailure<'r> {
+        AssertionFailure {
+            description: spec.description(),
+            expected: None,
+            actual: None,
+        }
+    }
+
     /// Builder method to add the expected value for the panic message.
     pub fn with_expected(&mut self, expected: String) -> &mut Self {
-        let mut spec = self;
-        spec.expected = Some(expected);
-        spec
+        let mut assertion = self;
+        assertion.expected = Some(expected);
+
+        assertion
     }
 
     /// Builder method to add the actual value for the panic message.
     pub fn with_actual(&mut self, actual: String) -> &mut Self {
-        let mut spec = self;
-        spec.actual = Some(actual);
-        spec
+        let mut assertion = self;
+        assertion.actual = Some(actual);
+
+        assertion
     }
 
     /// Builds the failure message with a description (if present), the expected value,
@@ -302,7 +327,8 @@ impl<'s, S> Spec<'s, S>
         let subject = self.subject;
 
         if !subject.eq(expected) {
-            self.with_expected(format!("<{:?}>", expected))
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("<{:?}>", expected))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -329,7 +355,8 @@ impl<'s, S> Spec<'s, S>
         let subject = self.subject;
 
         if !matching_function(subject) {
-            self.fail_with_message(format!("expectation failed for value <{:?}>", subject));
+            AssertionFailure::from_spec(self)
+                .fail_with_message(format!("expectation failed for value <{:?}>", subject));
         }
 
         self
@@ -348,8 +375,6 @@ impl<'s, S> Spec<'s, S>
         Spec {
             subject: mapping_function(self.subject),
             description: self.description,
-            expected: self.expected,
-            actual: self.actual,
         }
     }
 }

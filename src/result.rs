@@ -1,4 +1,4 @@
-use super::Spec;
+use super::{AssertionFailure, Spec};
 
 use std::fmt::Debug;
 
@@ -32,13 +32,15 @@ impl<'s, T, E> ContainingResultSpec<T, E> for Spec<'s, Result<T, E>>
         match self.subject {
             &Ok(ref val) => {
                 if !val.eq(expected_value) {
-                    self.with_expected(build_detail_message("ok", expected_value))
+                    AssertionFailure::from_spec(self)
+                        .with_expected(build_detail_message("ok", expected_value))
                         .with_actual(build_detail_message("ok", val))
                         .fail();
                 }
             }
             &Err(ref val) => {
-                self.with_expected(build_detail_message("ok", expected_value))
+                AssertionFailure::from_spec(self)
+                    .with_expected(build_detail_message("ok", expected_value))
                     .with_actual(build_detail_message("err", val))
                     .fail();
             }
@@ -57,13 +59,15 @@ impl<'s, T, E> ContainingResultSpec<T, E> for Spec<'s, Result<T, E>>
         match self.subject {
             &Err(ref val) => {
                 if !val.eq(expected_value) {
-                    self.with_expected(build_detail_message("err", expected_value))
+                    AssertionFailure::from_spec(self)
+                        .with_expected(build_detail_message("err", expected_value))
                         .with_actual(build_detail_message("err", val))
                         .fail();
                 }
             }
             &Ok(ref val) => {
-                self.with_expected(build_detail_message("err", expected_value))
+                AssertionFailure::from_spec(self)
+                    .with_expected(build_detail_message("err", expected_value))
                     .with_actual(build_detail_message("ok", val))
                     .fail();
             }
@@ -90,7 +94,8 @@ impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
         match self.subject {
             &Ok(_) => (),
             &Err(ref err) => {
-                self.with_expected(format!("result[ok]"))
+                AssertionFailure::from_spec(self)
+                    .with_expected(format!("result[ok]"))
                     .with_actual(format!("result[error]<{:?}>", err))
                     .fail();
             }
@@ -108,7 +113,8 @@ impl<'s, T, E> ResultSpec<T, E> for Spec<'s, Result<T, E>>
         match self.subject {
             &Err(_) => (),
             &Ok(ref val) => {
-                self.with_expected(format!("result[error]"))
+                AssertionFailure::from_spec(self)
+                    .with_expected(format!("result[error]"))
                     .with_actual(format!("result[ok]<{:?}>", val))
                     .fail();
             }
