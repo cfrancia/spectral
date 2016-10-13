@@ -8,8 +8,8 @@ macro_rules! generate_iter_spec_trait {
         pub trait $trait_name<'s, T: 's>
             where T: Debug + PartialEq
             {
-                fn contains(&mut self, expected_value: &'s T) -> &mut Self;
-                fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
+                fn contains(&mut self, expected_value: &'s T);
+                fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E)
                     where E: Iterator<Item = &'s T> + Clone;
             }
     }
@@ -21,8 +21,8 @@ generate_iter_spec_trait!(ContainingIteratorAssertions);
 pub trait MappingIterAssertions<'s, T: 's>
     where T: Debug
 {
-    fn matching_contains<F>(&mut self, matcher: F) -> &mut Self where F: Fn(&'s T) -> bool;
-    fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M) -> &mut Self
+    fn matching_contains<F>(&mut self, matcher: F) where F: Fn(&'s T) -> bool;
+    fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M)
         where M: Debug + PartialEq,
               F: Fn(&'s T) -> M;
 }
@@ -38,11 +38,9 @@ impl<'s, T: 's, I> ContainingIntoIterAssertions<'s, T> for Spec<'s, I>
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec).contains(&2);
     /// ```
-    fn contains(&mut self, expected_value: &'s T) -> &mut Self {
+    fn contains(&mut self, expected_value: &'s T) {
         let subject_iter = self.subject.into_iter();
         check_iterator_contains(self, subject_iter, &expected_value);
-
-        self
     }
 
     /// Asserts that the subject is equal to provided iterator. The subject must implement
@@ -54,12 +52,10 @@ impl<'s, T: 's, I> ContainingIntoIterAssertions<'s, T> for Spec<'s, I>
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec).equals_iterator(&expected_vec.iter());
     /// ```
-    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
+    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E)
         where E: Iterator<Item = &'s T> + Clone
     {
         compare_iterators(self, self.subject.into_iter(), expected_iter.clone());
-
-        self
     }
 }
 
@@ -74,11 +70,9 @@ impl<'s, T: 's, I> ContainingIteratorAssertions<'s, T> for Spec<'s, I>
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec.iter()).contains(&2);
     /// ```
-    fn contains(&mut self, expected_value: &'s T) -> &mut Self {
+    fn contains(&mut self, expected_value: &'s T) {
         let subject_iter = self.subject.clone();
         check_iterator_contains(self, subject_iter, &expected_value);
-
-        self
     }
 
     /// Asserts that the iterable subject is equal to provided iterator. The subject must implement
@@ -90,12 +84,10 @@ impl<'s, T: 's, I> ContainingIteratorAssertions<'s, T> for Spec<'s, I>
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec.iter()).equals_iterator(&expected_vec.iter());
     /// ```
-    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E) -> &mut Self
+    fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E)
         where E: Iterator<Item = &'s T> + Clone
     {
         compare_iterators(self, self.subject.clone(), expected_iter.clone());
-
-        self
     }
 }
 
@@ -120,7 +112,7 @@ impl<'s, T: 's, I> MappingIterAssertions<'s, T> for Spec<'s, I>
     ///
     /// assert_that(&vec![Simple { val: 1 }, Simple { val: 2 } ]).mapped_contains(|x| &x.val, &2);
     /// ```
-    fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M) -> &mut Self
+    fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M)
         where M: Debug + PartialEq,
               F: Fn(&'s T) -> M
     {
@@ -128,11 +120,10 @@ impl<'s, T: 's, I> MappingIterAssertions<'s, T> for Spec<'s, I>
 
         let mapped_vec: Vec<M> = subject.into_iter().map(mapping_function).collect();
         if mapped_vec.contains(&expected_value) {
-            return self;
+            return;
         }
 
         panic_unmatched(self, expected_value, mapped_vec);
-        unreachable!();
     }
 
     /// Asserts that the subject contains a matching item by using the provided function.
@@ -151,13 +142,13 @@ impl<'s, T: 's, I> MappingIterAssertions<'s, T> for Spec<'s, I>
     ///     }
     /// });
     /// ```
-    fn matching_contains<F>(&mut self, matcher: F) -> &mut Self
+    fn matching_contains<F>(&mut self, matcher: F)
         where F: Fn(&'s T) -> bool
     {
         let mut actual = Vec::new();
         for x in self.subject {
             if matcher(x) {
-                return self;
+                return;
             } else {
                 actual.push(x);
             }
@@ -165,8 +156,6 @@ impl<'s, T: 's, I> MappingIterAssertions<'s, T> for Spec<'s, I>
         AssertionFailure::from_spec(self)
             .fail_with_message(format!("expectation failed for iterator with values <{:?}>",
                                        actual));
-
-        unreachable!();
     }
 }
 

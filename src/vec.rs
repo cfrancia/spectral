@@ -1,7 +1,7 @@
 use super::{AssertionFailure, Spec};
 
 pub trait VecAssertions {
-    fn has_length(&mut self, expected: usize) -> &mut Self;
+    fn has_length(&mut self, expected: usize);
 }
 
 impl<'s, T> VecAssertions for Spec<'s, Vec<T>> {
@@ -11,7 +11,7 @@ impl<'s, T> VecAssertions for Spec<'s, Vec<T>> {
     /// ```rust,ignore
     /// assert_that(&vec![1, 2, 3, 4]).has_length(4);
     /// ```
-    fn has_length(&mut self, expected: usize) -> &mut Self {
+    fn has_length(&mut self, expected: usize) {
         let length = self.subject.len();
         if length != expected {
             AssertionFailure::from_spec(self)
@@ -19,8 +19,6 @@ impl<'s, T> VecAssertions for Spec<'s, Vec<T>> {
                 .with_actual(format!("<{}>", length))
                 .fail();
         }
-
-        self
     }
 }
 

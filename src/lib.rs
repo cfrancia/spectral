@@ -349,7 +349,7 @@ impl<'s, S> Spec<'s, S>
     /// ```rust,ignore
     /// assert_that(&"hello").matches(|x| x.eq(&"hello"));
     /// ```
-    pub fn matches<F>(&mut self, matching_function: F) -> &mut Self
+    pub fn matches<F>(&mut self, matching_function: F)
         where F: Fn(&'s S) -> bool
     {
         let subject = self.subject;
@@ -358,8 +358,6 @@ impl<'s, S> Spec<'s, S>
             AssertionFailure::from_spec(self)
                 .fail_with_message(format!("expectation failed for value <{:?}>", subject));
         }
-
-        self
     }
 
     /// Transforms the subject of the `Spec` by passing it through to the provided mapping
@@ -388,31 +386,14 @@ mod tests {
     fn should_be_able_to_use_macro_form_with_deliberate_reference() {
         let test_vec = vec![1, 2, 3, 4, 5];
 
-        assert_that!(&test_vec)
-            .has_length(5)
-            .contains(&3)
-            .contains(&5)
-            .mapped_contains(|val| val * 2, &6);
+        assert_that!(&test_vec).mapped_contains(|val| val * 2, &6);
     }
 
     #[test]
     fn should_be_able_to_use_macro_form_without_deliberate_reference() {
         let test_vec = vec![1, 2, 3, 4, 5];
 
-        assert_that!(test_vec)
-            .has_length(5)
-            .contains(&3)
-            .contains(&5)
-            .mapped_contains(|val| val * 2, &6);
-    }
-
-    #[test]
-    fn should_be_able_to_chain_assertions() {
-        assert_that(&vec![1, 2, 3, 4, 5])
-            .has_length(5)
-            .contains(&3)
-            .contains(&5)
-            .mapped_contains(|val| val * 2, &6);
+        assert_that!(test_vec).mapped_contains(|val| val * 2, &6);
     }
 
     #[test]

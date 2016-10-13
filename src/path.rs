@@ -3,10 +3,10 @@ use super::{AssertionFailure, Spec};
 use std::path::Path;
 
 pub trait PathAssertions {
-    fn exists(&mut self) -> &mut Self;
-    fn is_a_file(&mut self) -> &mut Self;
-    fn is_a_directory(&mut self) -> &mut Self;
-    fn has_file_name(&mut self, expected_file_name: &str) -> &mut Self;
+    fn exists(&mut self);
+    fn is_a_file(&mut self);
+    fn is_a_directory(&mut self);
+    fn has_file_name(&mut self, expected_file_name: &str);
 }
 
 impl<'s> PathAssertions for Spec<'s, &'s Path> {
@@ -15,7 +15,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
     /// ```rust,ignore
     /// assert_that(&Path::new("/tmp/file").exists();
     /// ```
-    fn exists(&mut self) -> &mut Self {
+    fn exists(&mut self) {
         let subject = self.subject;
         if !self.subject.exists() {
             AssertionFailure::from_spec(self)
@@ -23,8 +23,6 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
                 .with_actual(format!("a non-existent Path"))
                 .fail();
         }
-
-        self
     }
 
     /// Asserts that the subject `Path` refers to an existing file.
@@ -32,7 +30,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
     /// ```rust,ignore
     /// assert_that(&Path::new("/tmp/file").is_a_file();
     /// ```
-    fn is_a_file(&mut self) -> &mut Self {
+    fn is_a_file(&mut self) {
         let subject = self.subject;
         if !self.subject.is_file() {
             AssertionFailure::from_spec(self)
@@ -40,8 +38,6 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
                 .with_actual(format!("not a resolvable file"))
                 .fail();
         }
-
-        self
     }
 
     /// Asserts that the subject `Path` refers to an existing directory.
@@ -49,7 +45,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
     /// ```rust,ignore
     /// assert_that(&Path::new("/tmp/dir/").is_a_directory();
     /// ```
-    fn is_a_directory(&mut self) -> &mut Self {
+    fn is_a_directory(&mut self) {
         let subject = self.subject;
         if !self.subject.is_dir() {
             AssertionFailure::from_spec(self)
@@ -57,8 +53,6 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
                 .with_actual(format!("not a resolvable directory"))
                 .fail();
         }
-
-        self
     }
 
     /// Asserts that the subject `Path` has the expected file name.
@@ -66,7 +60,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
     /// ```rust,ignore
     /// assert_that(&Path::new("/tmp/file").has_file_name(&"file");
     /// ```
-    fn has_file_name(&mut self, expected_file_name: &str) -> &mut Self {
+    fn has_file_name(&mut self, expected_file_name: &str) {
         let subject = self.subject;
 
         let subject_file_name = match subject.file_name() {
@@ -99,8 +93,6 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
                 .with_actual(format!("<{}>", subject_file_name))
                 .fail();
         }
-
-        self
     }
 }
 

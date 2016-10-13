@@ -1,9 +1,9 @@
 use super::{AssertionFailure, Spec};
 
 pub trait StrAssertions {
-    fn starts_with(&mut self, expected: &str) -> &mut Self;
-    fn ends_with(&mut self, expected: &str) -> &mut Self;
-    fn contains(&mut self, expected: &str) -> &mut Self;
+    fn starts_with(&mut self, expected: &str);
+    fn ends_with(&mut self, expected: &str);
+    fn contains(&mut self, expected: &str);
 }
 
 impl<'s> StrAssertions for Spec<'s, &'s str> {
@@ -12,7 +12,7 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// ```rust,ignore
     /// assert_that(&"Hello").starts_with(&"H");
     /// ```
-    fn starts_with(&mut self, expected: &str) -> &mut Self {
+    fn starts_with(&mut self, expected: &str) {
         let subject = self.subject;
 
         if !subject.starts_with(expected) {
@@ -21,8 +21,6 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
-
-        self
     }
 
     /// Asserts that the subject `&str` ends with the provided `&str`.
@@ -30,7 +28,7 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// ```rust,ignore
     /// assert_that(&"Hello").ends_with(&"o");
     /// ```
-    fn ends_with(&mut self, expected: &str) -> &mut Self {
+    fn ends_with(&mut self, expected: &str) {
         let subject = self.subject;
 
         if !subject.ends_with(expected) {
@@ -39,8 +37,6 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
-
-        self
     }
 
     /// Asserts that the subject `&str` contains the provided `&str`.
@@ -48,7 +44,7 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// ```rust,ignore
     /// assert_that(&"Hello").contains(&"e");
     /// ```
-    fn contains(&mut self, expected: &str) -> &mut Self {
+    fn contains(&mut self, expected: &str) {
         let subject = self.subject;
 
         if !subject.contains(expected) {
@@ -57,8 +53,6 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
-
-        self
     }
 }
 

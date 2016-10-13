@@ -6,10 +6,10 @@ use std::cmp::PartialOrd;
 pub trait OrderedAssertions<T>
     where T: Debug + PartialOrd
 {
-    fn is_less_than(&mut self, other: &T) -> &mut Self;
-    fn is_less_than_or_equal_to(&mut self, other: &T) -> &mut Self;
-    fn is_greater_than(&mut self, other: &T) -> &mut Self;
-    fn is_greater_than_or_equal_to(&mut self, other: &T) -> &mut Self;
+    fn is_less_than(&mut self, other: &T);
+    fn is_less_than_or_equal_to(&mut self, other: &T);
+    fn is_greater_than(&mut self, other: &T);
+    fn is_greater_than_or_equal_to(&mut self, other: &T);
 }
 
 impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
@@ -21,7 +21,7 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
     /// ```rust,ignore
     /// assert_that(&1).is_less_than(&2);
     /// ```
-    fn is_less_than(&mut self, other: &T) -> &mut Self {
+    fn is_less_than(&mut self, other: &T) {
         let subject = self.subject;
 
         if subject >= other {
@@ -30,8 +30,6 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
-
-        self
     }
 
     /// Asserts that the subject is less than or equal to the expected value. The subject type
@@ -40,7 +38,7 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
     /// ```rust,ignore
     /// assert_that(&2).is_less_than_or_equal_to(&2);
     /// ```
-    fn is_less_than_or_equal_to(&mut self, other: &T) -> &mut Self {
+    fn is_less_than_or_equal_to(&mut self, other: &T) {
         let subject = self.subject;
 
         if subject > other {
@@ -49,8 +47,6 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
-
-        self
     }
 
     /// Asserts that the subject is greater than the expected value. The subject type must
@@ -59,7 +55,7 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
     /// ```rust,ignore
     /// assert_that(&2).is_greater_than(&1);
     /// ```
-    fn is_greater_than(&mut self, other: &T) -> &mut Self {
+    fn is_greater_than(&mut self, other: &T) {
         let subject = self.subject;
 
         if subject <= other {
@@ -68,8 +64,6 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
-
-        self
     }
 
     /// Asserts that the subject is greater than or equal to the expected value. The subject
@@ -78,7 +72,7 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
     /// ```rust,ignore
     /// assert_that(&2).is_greater_than_or_equal_to(&1);
     /// ```
-    fn is_greater_than_or_equal_to(&mut self, other: &T) -> &mut Self {
+    fn is_greater_than_or_equal_to(&mut self, other: &T) {
         let subject = self.subject;
 
         if subject < other {
@@ -87,8 +81,6 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
-
-        self
     }
 }
 

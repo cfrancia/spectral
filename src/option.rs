@@ -6,14 +6,14 @@ use std::fmt::Debug;
 pub trait OptionAssertions<T>
     where T: Debug
 {
-    fn is_some(&mut self) -> &mut Self;
-    fn is_none(&mut self) -> &mut Self;
+    fn is_some(&mut self);
+    fn is_none(&mut self);
 }
 
 pub trait ContainingOptionAssertions<T>
     where T: Debug + PartialEq
 {
-    fn contains_value(&mut self, expected_value: &T) -> &mut Self;
+    fn contains_value(&mut self, expected_value: &T);
 }
 
 impl<'s, T> ContainingOptionAssertions<T> for Spec<'s, Option<T>>
@@ -25,7 +25,7 @@ impl<'s, T> ContainingOptionAssertions<T> for Spec<'s, Option<T>>
     /// ```rust,ignore
     /// assert_that(&Some(1)).contains_value(&1);
     /// ```
-    fn contains_value(&mut self, expected_value: &T) -> &mut Self {
+    fn contains_value(&mut self, expected_value: &T) {
         match self.subject {
             &Some(ref val) => {
                 if !val.eq(expected_value) {
@@ -42,8 +42,6 @@ impl<'s, T> ContainingOptionAssertions<T> for Spec<'s, Option<T>>
                     .fail();
             }
         };
-
-        self
     }
 }
 
@@ -55,7 +53,7 @@ impl<'s, T> OptionAssertions<T> for Spec<'s, Option<T>>
     /// ```rust,ignore
     /// assert_that(&Some(1)).is_some();
     /// ```
-    fn is_some(&mut self) -> &mut Self {
+    fn is_some(&mut self) {
         match self.subject {
             &Some(_) => (),
             &None => {
@@ -65,8 +63,6 @@ impl<'s, T> OptionAssertions<T> for Spec<'s, Option<T>>
                     .fail();
             }
         };
-
-        self
     }
 
     /// Asserts that the subject is `None`. The value type must be an `Option`.
@@ -74,7 +70,7 @@ impl<'s, T> OptionAssertions<T> for Spec<'s, Option<T>>
     /// ```rust,ignore
     /// assert_that(&Option::None::<String>).is_none();
     /// ```
-    fn is_none(&mut self) -> &mut Self {
+    fn is_none(&mut self) {
         match self.subject {
             &None => (),
             &Some(ref val) => {
@@ -84,8 +80,6 @@ impl<'s, T> OptionAssertions<T> for Spec<'s, Option<T>>
                     .fail();
             }
         };
-
-        self
     }
 }
 

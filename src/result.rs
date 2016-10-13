@@ -6,16 +6,16 @@ pub trait ResultAssertions<T, E>
     where T: Debug,
           E: Debug
 {
-    fn is_ok(&mut self) -> &mut Self;
-    fn is_error(&mut self) -> &mut Self;
+    fn is_ok(&mut self);
+    fn is_error(&mut self);
 }
 
 pub trait ContainingResultAssertions<T, E>
     where T: Debug + PartialEq,
           E: Debug + PartialEq
 {
-    fn is_ok_containing(&mut self, expected_value: &T) -> &mut Self;
-    fn is_err_containing(&mut self, expected_value: &E) -> &mut Self;
+    fn is_ok_containing(&mut self, expected_value: &T);
+    fn is_err_containing(&mut self, expected_value: &E);
 }
 
 impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
@@ -28,7 +28,7 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
     /// ```rust,ignore
     /// assert_that(&Result::Ok::<usize, usize>(1)).is_ok_containing(&1);
     /// ```
-    fn is_ok_containing(&mut self, expected_value: &T) -> &mut Self {
+    fn is_ok_containing(&mut self, expected_value: &T) {
         match self.subject {
             &Ok(ref val) => {
                 if !val.eq(expected_value) {
@@ -45,8 +45,6 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
                     .fail();
             }
         }
-
-        self
     }
 
     /// Asserts that the subject is an `Err` Result containing the expected value.
@@ -55,7 +53,7 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
     /// ```rust,ignore
     /// assert_that(&Result::Err::<usize, usize>(1)).is_err_containing(&1);
     /// ```
-    fn is_err_containing(&mut self, expected_value: &E) -> &mut Self {
+    fn is_err_containing(&mut self, expected_value: &E) {
         match self.subject {
             &Err(ref val) => {
                 if !val.eq(expected_value) {
@@ -72,8 +70,6 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
                     .fail();
             }
         }
-
-        self
     }
 }
 
@@ -90,7 +86,7 @@ impl<'s, T, E> ResultAssertions<T, E> for Spec<'s, Result<T, E>>
     /// ```rust,ignore
     /// assert_that(&Result::Ok::<usize, usize>(1)).is_ok();
     /// ```
-    fn is_ok(&mut self) -> &mut Self {
+    fn is_ok(&mut self) {
         match self.subject {
             &Ok(_) => (),
             &Err(ref err) => {
@@ -100,8 +96,6 @@ impl<'s, T, E> ResultAssertions<T, E> for Spec<'s, Result<T, E>>
                     .fail();
             }
         };
-
-        self
     }
 
     /// Asserts that the subject is `Err`. The value type must be a `Result`.
@@ -109,7 +103,7 @@ impl<'s, T, E> ResultAssertions<T, E> for Spec<'s, Result<T, E>>
     /// ```rust,ignore
     /// assert_that(&Result::Err::<usize, usize>(1)).is_error();
     /// ```
-    fn is_error(&mut self) -> &mut Self {
+    fn is_error(&mut self) {
         match self.subject {
             &Err(_) => (),
             &Ok(ref val) => {
@@ -119,8 +113,6 @@ impl<'s, T, E> ResultAssertions<T, E> for Spec<'s, Result<T, E>>
                     .fail();
             }
         };
-
-        self
     }
 }
 
