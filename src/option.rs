@@ -3,10 +3,10 @@ use super::{AssertionFailure, Spec};
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
-pub trait OptionAssertions<T>
+pub trait OptionAssertions<'r, T>
     where T: Debug
 {
-    fn is_some(&mut self);
+    fn is_some(&mut self) -> Spec<'r, T>;
     fn is_none(&mut self);
 }
 
@@ -45,22 +45,31 @@ impl<'s, T> ContainingOptionAssertions<T> for Spec<'s, Option<T>>
     }
 }
 
-impl<'s, T> OptionAssertions<T> for Spec<'s, Option<T>>
+impl<'s, T> OptionAssertions<'s, T> for Spec<'s, Option<T>>
     where T: Debug
 {
     /// Asserts that the subject is `Some`. The subject type must be an `Option`.
     ///
+    /// This will return a new `Spec` containing the unwrapped value if it is `Some`.
+    ///
     /// ```rust,ignore
     /// assert_that(&Some(1)).is_some();
     /// ```
-    fn is_some(&mut self) {
-        match self.subject {
-            &Some(_) => (),
+    fn is_some(&mut self) -> Spec<'s, T> {
+        return match self.subject {
+            &Some(ref val) => {
+                Spec {
+                    subject: val,
+                    description: self.description,
+                }
+            }
             &None => {
                 AssertionFailure::from_spec(self)
                     .with_expected(format!("option[some]"))
                     .with_actual(format!("option[none]"))
                     .fail();
+
+                unreachable!();
             }
         };
     }
@@ -99,6 +108,12 @@ mod tests {
     fn should_panic_if_option_is_expected_to_contain_value_and_does_not() {
         let option: Option<&str> = None;
         assert_that(&option).is_some();
+    }
+
+    #[test]
+    fn should_be_able_to_unwrap_option_if_some() {
+        let option = Some("Hello");
+        assert_that(&option).is_some().is_equal_to(&"Hello");
     }
 
     #[test]
