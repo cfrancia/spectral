@@ -128,6 +128,7 @@ As a general note, any type under test will usually need to implement at least `
 
 ### Vectors
 #### has_length
+#### is_empty
 
 ### HashMaps
 #### has_length
