@@ -91,6 +91,10 @@ As a general note, any type under test will usually need to implement at least `
 #### is_equal_to
 #### matches
 
+### Booleans
+#### is_true
+#### is_false
+
 ### Numbers
 #### is_less_than
 #### is_less_than_or_equal_to

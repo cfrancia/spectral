@@ -144,6 +144,7 @@ use std::fmt::Debug;
 
 use colours::{TERM_RED, TERM_BOLD, TERM_RESET};
 
+pub mod boolean;
 pub mod hashmap;
 pub mod numeric;
 pub mod option;
