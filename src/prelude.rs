@@ -1,4 +1,5 @@
 pub use super::{asserting, assert_that};
+pub use super::hashmap::HashMapAssertions;
 pub use super::iter::{ContainingIntoIterAssertions, ContainingIteratorAssertions,
                       MappingIterAssertions};
 pub use super::numeric::OrderedAssertions;
