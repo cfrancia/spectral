@@ -69,8 +69,8 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
         }
     }
 
-    /// Asserts that the subject is greater than or equal to the expected value. The subject
-    /// type must implement `PartialOrd`.
+    /// Asserts that the subject is greater than or equal to the expected value. The subject type
+    /// must implement `PartialOrd`.
     ///
     /// ```rust,ignore
     /// assert_that(&2).is_greater_than_or_equal_to(&1);
@@ -94,6 +94,12 @@ pub trait FloatAssertions<T: Float> {
 
 #[cfg(feature = "num")]
 impl<'s, T: Float + Debug> FloatAssertions<T> for Spec<'s, T> {
+    /// Asserts that the subject is close to the expected value by the specified tolerance.
+    /// The subject type must implement `Float` and `Debug`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&2.0f64).is_close_to(2.0f64, 0.01f64);
+    /// ```
     fn is_close_to(&mut self, expected: T, tolerance: T) {
         let subject = *self.subject;
 
