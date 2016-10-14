@@ -45,7 +45,8 @@ The methods avaliable for asserting depend upon the type under test and what tra
 
 For failing assertions, the usual panic message follows the following format:
 ```
-expected <something> but was <something else>
+    expected: <2>
+     but was: <1>
 ```
 
 To add additional clarification to the panic message, you can also deliberately state what you are asserting by calling the `asserting(...)` function rather than `assert_that(...)`:
@@ -55,7 +56,9 @@ asserting(&"test condition").that(&1).is_equal_to(&2);
 
 Which will produce:
 ```
-test condition: expected <2> but was <1>
+    test condition:
+    expected: <2>
+     but was: <1>
 ```
 
 ### Mapping values
