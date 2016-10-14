@@ -94,6 +94,9 @@ As a general note, any type under test will usually need to implement at least `
 #### is_greater_than
 #### is_greater_than_or_equal_to
 
+### Floats (optional)
+#### is_close_to
+
 ### Options
 #### is_some
 #### is_none
@@ -131,6 +134,11 @@ As a general note, any type under test will usually need to implement at least `
 
 ### IntoIterator
 #### matching_contains
+
+## Optional Features
+
+### Num Crate
+The `num` crate is used for `Float` assertions. This feature will be enabled by default, but if you don't want the dependency on `num`, then simply disable it.
 
 ## How it works
 

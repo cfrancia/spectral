@@ -8,4 +8,8 @@ repository = "https://github.com/cfrancia/spectral"
 readme = "README.md"
 keywords = ["fluent", "testing", "matchers", "assert", "assertions"]
 
+[features]
+default = ["num"]
+
 [dependencies]
+num = { version = "0.1.36", optional = true }

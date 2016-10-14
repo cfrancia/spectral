@@ -8,3 +8,6 @@ pub use super::path::PathAssertions;
 pub use super::result::{ContainingResultAssertions, ResultAssertions};
 pub use super::string::StrAssertions;
 pub use super::vec::VecAssertions;
+
+#[cfg(feature = "num")]
+pub use super::numeric::FloatAssertions;

@@ -170,6 +170,9 @@ mod colours {
     pub const TERM_RESET: &'static str = "";
 }
 
+#[cfg(feature = "num")]
+extern crate num;
+
 #[macro_export]
 macro_rules! assert_that {
     (&$subject:ident$(.$additional_subject:ident)*) => {
