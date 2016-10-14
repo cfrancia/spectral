@@ -9,7 +9,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-spectral = "0.3.0"
+spectral = "0.4.0"
 ```
 
 Then add this to your crate:
@@ -106,8 +106,8 @@ As a general note, any type under test will usually need to implement at least `
 #### has_file_name
 
 ### Results
-#### is_ok
-#### is_error
+#### is_ok -> (returns a new Spec with the Ok value)
+#### is_error -> (returns a new Spec with the Err value)
 #### is_ok_containing
 #### is_err_containing
 
@@ -118,6 +118,11 @@ As a general note, any type under test will usually need to implement at least `
 
 ### Vectors
 #### has_length
+
+### HashMaps
+#### has_length
+#### contains_key -> (returns a new Spec with the key value)
+#### contains_key_with_value
 
 ### IntoIterator/Iterator
 #### contains
@@ -153,28 +158,27 @@ Naturally traits need to be included with a `use` before they apply, but to avoi
 
 To create your own assertions, simply create a new trait containing your assertion methods and implement Spec against it.
 
-The `Spec` struct always implements `with_expected(...)`, `with_actual(...)` and `fail(...)`, which provides the necessary functionality to fail the test with the usual message format. If you need greater control of the failure message, you can call `fail_with_message(...)` which will directly print the provided message.
+To fail an assertion, create a new `AssertionFailure` struct using `from_spec(...)` within your assertion method and pass in `self`.
+
+`AssertionFailure` also implements builder methods `with_expected(...)`, `with_actual(...)` and `fail(...)`, which provides the necessary functionality to fail the test with the usual message format. If you need greater control of the failure message, you can call `fail_with_message(...)` which will directly print the provided message.
 
 In either case, any description provided using `asserting(...)` will always be prepended to the panic message.
 
 For example, to create an assertion that the length of a `Vec` is at least a certain value:
 ```rust
 trait VecAtLeastLength {
-    fn has_at_least_length(self, expected: usize);
+    fn has_at_least_length(&mut self, expected: usize);
 }
 
 impl<'s, T> VecAtLeastLength for Spec<'s, Vec<T>> {
-    fn has_at_least_length(self, expected: usize) {
+    fn has_at_least_length(&mut self, expected: usize) {
         let subject = self.subject;
         if expected > subject.len() {
-            self.with_expected(format!("vec with length at least <{}>", expected))
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("vec with length at least <{}>", expected))
                 .with_actual(format!("<{}>", subject.len()))
                 .fail();
         }
     }
 }
 ```
-
-## Notes
-
-This is still very much a work in progress. There are still many assertions missing on basic types, and the ones that are there may still change or be updated as required.
