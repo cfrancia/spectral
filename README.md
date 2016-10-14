@@ -131,6 +131,7 @@ As a general note, any type under test will usually need to implement at least `
 
 ### HashMaps
 #### has_length
+#### is_empty
 #### contains_key -> (returns a new Spec with the key value)
 #### contains_key_with_value
 

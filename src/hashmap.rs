@@ -6,6 +6,7 @@ use std::hash::Hash;
 
 pub trait HashMapAssertions<'s, K: Hash + Eq, V: PartialEq> {
     fn has_length(&mut self, expected: usize);
+    fn is_empty(&mut self);
     fn contains_key(&mut self, expected_key: &K) -> Spec<'s, V>;
     fn contains_key_with_value(&mut self, expected_key: &K, expected_value: &V);
 }
@@ -31,6 +32,23 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
             AssertionFailure::from_spec(self)
                 .with_expected(format!("hashmap to have length <{}>", expected))
                 .with_actual(format!("<{}>", subject.len()))
+                .fail();
+        }
+    }
+
+    /// Asserts that the subject hashmap is empty. The subject type must be of `HashMap`.
+    ///
+    /// ```rust,ignore
+    /// let test_map: HashMap<u8, u8> = HashMap::new();
+    /// assert_that(&test_map).is_empty();
+    /// ```
+    fn is_empty(&mut self) {
+        let subject = self.subject;
+
+        if !subject.is_empty() {
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("an empty hashmap"))
+                .with_actual(format!("a hashmap with length <{:?}>", subject.len()))
                 .fail();
         }
     }
@@ -128,6 +146,22 @@ mod tests {
         test_map.insert(2, 2);
 
         assert_that(&test_map).has_length(1);
+    }
+
+    #[test]
+    fn should_not_panic_if_hashmap_was_expected_to_be_empty_and_is() {
+        let test_map: HashMap<u8, u8> = HashMap::new();
+        assert_that(&test_map).is_empty();
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: an empty hashmap\
+                   \n\t but was: a hashmap with length <1>")]
+    fn should_panic_if_hashmap_was_expected_to_be_empty_and_is_not() {
+        let mut test_map = HashMap::new();
+        test_map.insert(1, 1);
+
+        assert_that(&test_map).is_empty();
     }
 
     #[test]
