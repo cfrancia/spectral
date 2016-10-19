@@ -83,7 +83,73 @@ This allows you to pass through a subject to test without needing to deliberatel
 assert_that!(&test_vec).has_length(5)
 ```
 
-## Assertions
+## Assertions (Basic)
+
+Note: Descriptions and examples for each of the assertions are further down in this readme.
+
+### General
+#### is_equal_to
+#### matches
+
+### Booleans
+#### is_true
+#### is_false
+
+### Numbers
+#### is_less_than
+#### is_less_than_or_equal_to
+#### is_greater_than
+#### is_greater_than_or_equal_to
+
+### Floats (optional)
+#### is_close_to
+
+### Options
+#### is_some -> (returns a new Spec with the Option value)
+#### is_none
+#### contains_value
+
+### Paths
+#### exists
+#### is_file
+#### is_directory
+#### has_file_name
+
+### Results
+#### is_ok -> (returns a new Spec with the Ok value)
+#### is_error -> (returns a new Spec with the Err value)
+#### is_ok_containing
+#### is_err_containing
+
+### Strings
+#### starts_with
+#### ends_with
+#### contains
+
+### Vectors
+#### has_length
+#### is_empty
+
+### HashMaps
+#### has_length
+#### is_empty
+#### contains_key -> (returns a new Spec with the key value)
+#### contains_key_with_value
+
+### IntoIterator/Iterator
+#### contains
+#### mapped_contains
+#### equals_iterator
+
+### IntoIterator
+#### matching_contains
+
+## Optional Features
+
+### Num Crate
+The `num` crate is used for `Float` assertions. This feature will be enabled by default, but if you don't want the dependency on `num`, then simply disable it.
+
+## Assertions (Detailed)
 
 As a general note, any type under test will usually need to implement at least `Debug`. Other assertions will have varying bounds attached to them.
 
@@ -667,26 +733,20 @@ assert_that(&test_into_iter).matching_contains(|val| {
 expectation failed for iterator with values <[Bad, Bad, Bad]>
 ```
 
-
-## Optional Features
-
-### Num Crate
-The `num` crate is used for `Float` assertions. This feature will be enabled by default, but if you don't want the dependency on `num`, then simply disable it.
-
 ## How it works
 
 The `Spec` struct implements a number of different bounded traits which provide assertions based upon the bound type.
 
-As a single example, length assertions are provided by the `VecSpec` trait:
+As a single example, length assertions are provided by the `VecAssertions` trait:
 ```rust
-pub trait VecSpec {            
+pub trait VecAssertions {            
     fn has_length(self, expected: usize);
 } 
 ```
 
 Which is then implemented by Spec:
 ```rust
-impl<'s, T> VecSpec for Spec<'s, Vec<T>> {
+impl<'s, T> VecAssertions for Spec<'s, Vec<T>> {
     fn has_length(self, expected: usize) {
       ...
     }
