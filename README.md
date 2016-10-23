@@ -89,6 +89,7 @@ Note: Descriptions and examples for each of the assertions are further down in t
 
 ### General
 #### is_equal_to
+#### is_not_equal_to
 #### matches
 
 ### Booleans
@@ -167,6 +168,21 @@ assert_that(&"hello").is_equal_to(&"hello");
 ```bash
 	expected: <2>
 	 but was: <1>
+```
+
+#### is_not_equal_to
+
+Asserts that the subject and the expected value are not equal. The subject type must implement `PartialEq`.
+
+##### Example
+```rust
+assert_that(&"hello").is_not_equal_to(&"hello");
+```
+
+##### Failure Message
+```bash
+	expected: <1> to not equal <1>
+	 but was: equal
 ```
 
 #### matches

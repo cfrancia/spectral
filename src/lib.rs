@@ -340,6 +340,25 @@ impl<'s, S> Spec<'s, S>
 
         self
     }
+
+    /// Asserts that the actual value and the expected value are not equal. The value type must
+    /// implement `PartialEq`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&"hello").is_not_equal_to(&"hello");
+    /// ```
+    pub fn is_not_equal_to(&mut self, expected: &S) -> &mut Self {
+        let subject = self.subject;
+
+        if subject.eq(expected) {
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("<{:?}> to not equal <{:?}>", subject, expected))
+                .with_actual(format!("equal"))
+                .fail();
+        }
+
+        self
+    }
 }
 
 impl<'s, S> Spec<'s, S>
@@ -423,6 +442,17 @@ mod tests {
     #[should_panic(expected = "\n\texpected: <2>\n\t but was: <1>")]
     fn should_panic_on_unequal_subjects() {
         assert_that(&1).is_equal_to(&2);
+    }
+
+    #[test]
+    fn should_not_panic_on_unequal_subjects_if_expected() {
+        assert_that(&1).is_not_equal_to(&2);
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: <1> to not equal <1>\n\t but was: equal")]
+    fn should_panic_on_equal_subjects_if_expected_unequal() {
+        assert_that(&1).is_not_equal_to(&1);
     }
 
     #[test]
