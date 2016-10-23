@@ -139,6 +139,7 @@ Note: Descriptions and examples for each of the assertions are further down in t
 
 ### IntoIterator/Iterator
 #### contains
+#### does_not_contain
 #### mapped_contains
 #### equals_iterator
 
@@ -680,6 +681,22 @@ assert_that(&test_vec).contains(&2);
 ```bash
 	expected: iterator to contain <1>
 	 but was: <[5, 6]>
+```
+
+#### does_not_contain
+
+Asserts that the subject does not contain the provided value. The subject must implement `IntoIterator` or `Iterator`, and the contained type must implement `PartialEq` and `Debug`.
+
+##### Example
+```rust
+let test_vec = vec![1,2,3];
+assert_that(&test_vec).does_not_contain(&4);
+```
+
+##### Failure Message
+```bash
+	expected: iterator to not contain <1>
+	 but was: <[1, 2]>
 ```
 
 #### mapped_contains
