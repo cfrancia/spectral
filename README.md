@@ -137,6 +137,7 @@ Note: Descriptions and examples for each of the assertions are further down in t
 #### contains_key -> (returns a new Spec with the key value)
 #### does_not_contain_key
 #### contains_entry
+#### does_not_contain_entry
 
 ### IntoIterator/Iterator
 #### contains
@@ -680,8 +681,26 @@ assert_that(&test_map).contains_entry(&"hello", &"hi");
 
 ##### Failure Message
 ```bash
-	expected: hashmap containing key <"hi"> with value <"hey">
-	 but was: key <"hi"> with value <"hello"> instead
+    expected: hashmap containing key <"hi"> with value <"hey">
+     but was: key <"hi"> with value <"hello"> instead
+```
+
+#### does_not_contain_entry
+
+Asserts that the subject hashmap does not contain the provided key and value. The subject type must be of `HashMap`.
+
+##### Example
+```rust
+let mut test_map = HashMap::new();
+test_map.insert("hello", "hi");
+
+assert_that(&test_map).does_not_contain_entry(&"hello", &"hey");
+```
+
+##### Failure Message
+```bash
+    expected: hashmap to not contain key <"hello"> with value <"hi">
+     but was: present in hashmap
 ```
 
 

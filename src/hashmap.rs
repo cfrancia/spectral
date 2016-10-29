@@ -10,6 +10,7 @@ pub trait HashMapAssertions<'s, K: Hash + Eq, V: PartialEq> {
     fn contains_key(&mut self, expected_key: &K) -> Spec<'s, V>;
     fn does_not_contain_key(&mut self, expected_key: &K);
     fn contains_entry(&mut self, expected_key: &K, expected_value: &V);
+    fn does_not_contain_entry(&mut self, expected_key: &K, expected_value: &V);
 }
 
 impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
@@ -141,6 +142,32 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
             .fail();
 
     }
+
+    /// Asserts that the subject hashmap does not contains the provided key and value.
+    /// The subject type must be of `HashMap`.
+    ///
+    /// ```rust,ignore
+    /// let mut test_map = HashMap::new();
+    /// test_map.insert("hello", "hi");
+    ///
+    /// assert_that(&test_map).does_not_contain_entry(&"hello", &"hey");
+    /// ```
+    fn does_not_contain_entry(&mut self, expected_key: &K, expected_value: &V) {
+        let subject = self.subject;
+
+        if let Some(value) = subject.get(expected_key) {
+            if !value.eq(expected_value) {
+                return;
+            }
+
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("hashmap to not contain key <{:?}> with value <{:?}>",
+                                       expected_key,
+                                       expected_value))
+                .with_actual(format!("present in hashmap"))
+                .fail();
+        }
+    }
 }
 
 #[cfg(test)]
@@ -257,5 +284,32 @@ mod tests {
         test_map.insert("hi", "hello");
 
         assert_that(&test_map).contains_entry(&"hi", &"hey");
+    }
+
+    #[test]
+    fn should_not_panic_if_hashmap_does_not_contain_entry_if_expected() {
+        let mut test_map = HashMap::new();
+        test_map.insert("hello", "hi");
+
+        assert_that(&test_map).does_not_contain_entry(&"hey", &"hi");
+    }
+
+    #[test]
+    fn should_not_panic_if_hashmap_contains_entry_with_different_value_if_expected() {
+        let mut test_map = HashMap::new();
+        test_map.insert("hi", "hello");
+
+        assert_that(&test_map).does_not_contain_entry(&"hi", &"hey");
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: hashmap to not contain key <\"hello\"> \
+    with value <\"hi\">\
+                   \n\t but was: present in hashmap")]
+    fn should_panic_if_hashmap_contains_entry_if_not_expected() {
+        let mut test_map = HashMap::new();
+        test_map.insert("hello", "hi");
+
+        assert_that(&test_map).does_not_contain_entry(&"hello", &"hi");
     }
 }
