@@ -8,7 +8,8 @@ pub trait HashMapAssertions<'s, K: Hash + Eq, V: PartialEq> {
     fn has_length(&mut self, expected: usize);
     fn is_empty(&mut self);
     fn contains_key(&mut self, expected_key: &K) -> Spec<'s, V>;
-    fn contains_key_with_value(&mut self, expected_key: &K, expected_value: &V);
+    fn does_not_contain_key(&mut self, expected_key: &K);
+    fn contains_entry(&mut self, expected_key: &K, expected_value: &V);
 }
 
 impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
@@ -84,6 +85,26 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
         unreachable!();
     }
 
+    /// Asserts that the subject hashmap does not contain the provided key. The subject type must be
+    /// of `HashMap`.
+    ///
+    /// ```rust,ignore
+    /// let mut test_map = HashMap::new();
+    /// test_map.insert("hello", "hi");
+    ///
+    /// assert_that(&test_map).does_not_contain_key(&"hey");
+    /// ```
+    fn does_not_contain_key(&mut self, expected_key: &K) {
+        let subject = self.subject;
+
+        if let Some(_) = subject.get(expected_key) {
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("hashmap to not contain key <{:?}>", expected_key))
+                .with_actual(format!("present in hashmap"))
+                .fail();
+        }
+    }
+
     /// Asserts that the subject hashmap contains the expected key with the expected value.
     /// The subject type must be of `HashMap`.
     ///
@@ -91,9 +112,9 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
     /// let mut test_map = HashMap::new();
     /// test_map.insert("hello", "hi");
     ///
-    /// assert_that(&test_map).contains_key_with_value(&"hello", &"hi");
+    /// assert_that(&test_map).contains_entry(&"hello", &"hi");
     /// ```
-    fn contains_key_with_value(&mut self, expected_key: &K, expected_value: &V) {
+    fn contains_entry(&mut self, expected_key: &K, expected_value: &V) {
         let expected_message = format!("hashmap containing key <{:?}> with value <{:?}>",
                                        expected_key,
                                        expected_value);
@@ -193,30 +214,48 @@ mod tests {
     }
 
     #[test]
-    fn should_not_panic_if_hashmap_contains_key_with_value() {
+    fn should_not_panic_if_hashmap_does_not_contain_key_when_expected() {
         let mut test_map = HashMap::new();
         test_map.insert("hello", "hi");
 
-        assert_that(&test_map).contains_key_with_value(&"hello", &"hi");
+        assert_that(&test_map).does_not_contain_key(&"hey");
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: hashmap to not contain key <\"hello\">\
+                   \n\t but was: present in hashmap")]
+    fn should_panic_if_hashmap_does_contain_key_when_not_expected() {
+        let mut test_map = HashMap::new();
+        test_map.insert("hello", "hi");
+
+        assert_that(&test_map).does_not_contain_key(&"hello");
+    }
+
+    #[test]
+    fn should_not_panic_if_hashmap_contains_entry() {
+        let mut test_map = HashMap::new();
+        test_map.insert("hello", "hi");
+
+        assert_that(&test_map).contains_entry(&"hello", &"hi");
     }
 
     #[test]
     #[should_panic(expected = "\n\texpected: hashmap containing key <\"hey\"> with value <\"hi\">\
                    \n\t but was: no matching key, keys are <[\"hello\"]>")]
-    fn should_panic_if_hashmap_contains_key_with_value_without_key() {
+    fn should_panic_if_hashmap_contains_entry_without_key() {
         let mut test_map = HashMap::new();
         test_map.insert("hello", "hi");
 
-        assert_that(&test_map).contains_key_with_value(&"hey", &"hi");
+        assert_that(&test_map).contains_entry(&"hey", &"hi");
     }
 
     #[test]
     #[should_panic(expected = "\n\texpected: hashmap containing key <\"hi\"> with value <\"hey\">\
                    \n\t but was: key <\"hi\"> with value <\"hello\"> instead")]
-    fn should_panic_if_hashmap_contains_key_with_value_with_different_value() {
+    fn should_panic_if_hashmap_contains_entry_with_different_value() {
         let mut test_map = HashMap::new();
         test_map.insert("hi", "hello");
 
-        assert_that(&test_map).contains_key_with_value(&"hi", &"hey");
+        assert_that(&test_map).contains_entry(&"hi", &"hey");
     }
 }

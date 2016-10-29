@@ -88,8 +88,8 @@ impl<'s, T: 's, I> ContainingIteratorAssertions<'s, T> for Spec<'s, I>
         check_iterator_contains(self, subject_iter, &expected_value, true);
     }
 
-    /// Asserts that the iterable subject does not contain the provided value. The subject must implement
-    /// `Iterator`, and the contained type must implement `PartialEq` and `Debug`.
+    /// Asserts that the iterable subject does not contain the provided value. The subject must
+    /// implement `Iterator`, and the contained type must implement `PartialEq` and `Debug`.
     ///
     /// ```rust,ignore
     /// let test_vec = vec![1,2,3];
@@ -184,7 +184,10 @@ impl<'s, T: 's, I> MappingIterAssertions<'s, T> for Spec<'s, I>
     }
 }
 
-fn check_iterator_contains<T, V, I>(spec: &mut Spec<T>, actual_iter: I, expected_value: &V, should_contain: bool)
+fn check_iterator_contains<T, V, I>(spec: &mut Spec<T>,
+                                    actual_iter: I,
+                                    expected_value: &V,
+                                    should_contain: bool)
     where V: PartialEq + Debug,
           I: Iterator<Item = V>
 {
@@ -261,13 +264,12 @@ fn compare_iterators<T, V, I, E>(spec: &mut Spec<T>, actual_iter: I, expected_it
     }
 }
 
-fn panic_unmatched<T, E: Debug, A: Debug>(spec: &mut Spec<T>, expected: E, actual: A, should_contain: bool) {
+fn panic_unmatched<T, E: Debug, A: Debug>(spec: &mut Spec<T>,
+                                          expected: E,
+                                          actual: A,
+                                          should_contain: bool) {
     let condition = {
-        if should_contain {
-            " "
-        } else {
-            " not "
-        }
+        if should_contain { " " } else { " not " }
     };
 
     AssertionFailure::from_spec(spec)
