@@ -112,6 +112,7 @@ Note: Descriptions and examples for each of the assertions are further down in t
 
 ### Paths
 #### exists
+#### does_not_exist
 #### is_file
 #### is_directory
 #### has_file_name
@@ -379,6 +380,21 @@ assert_that(&Path::new("/tmp/file").exists();
 ```bash
 	expected: Path of <"/tmp/file"> to exist
 	 but was: a non-existent Path
+```
+
+#### does_not_exist
+
+Asserts that the subject `Path` does not refer to an existing location.
+
+##### Example
+```rust
+assert_that(&Path::new("/tmp/file").does_not_exist();
+```
+
+##### Failure Message
+```bash
+	expected: Path of <"/tmp/file"> to not exist
+     but was: a resolvable Path
 ```
 
 #### is_file

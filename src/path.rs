@@ -4,6 +4,7 @@ use std::path::Path;
 
 pub trait PathAssertions {
     fn exists(&mut self);
+    fn does_not_exist(&mut self);
     fn is_a_file(&mut self);
     fn is_a_directory(&mut self);
     fn has_file_name(&mut self, expected_file_name: &str);
@@ -21,6 +22,21 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
             AssertionFailure::from_spec(self)
                 .with_expected(format!("Path of <{:?}> to exist", subject))
                 .with_actual(format!("a non-existent Path"))
+                .fail();
+        }
+    }
+
+    /// Asserts that the subject `Path` does not refer to an existing location.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&Path::new("/tmp/file").does_not_exist();
+    /// ```
+    fn does_not_exist(&mut self) {
+        let subject = self.subject;
+        if self.subject.exists() {
+            AssertionFailure::from_spec(self)
+                .with_expected(format!("Path of <{:?}> to not exist", subject))
+                .with_actual(format!("a resolvable Path"))
                 .fail();
         }
     }
@@ -125,6 +141,19 @@ mod tests {
     #[test]
     pub fn should_not_panic_if_path_represents_a_directory() {
         assert_that(&Path::new(MANIFEST_PATH)).is_a_directory();
+    }
+
+    #[test]
+    pub fn should_not_panic_if_path_does_not_exist_when_expected() {
+        let failing_path = MANIFEST_PATH.to_string() + "/does-not-exist";
+        assert_that(&Path::new(&failing_path)).does_not_exist();
+    }
+
+    #[test]
+    // It's unfortunately a bit hard to expect a message without knowing the manifest path
+    #[should_panic]
+    pub fn should_panic_if_path_exists_when_not_expected() {
+        assert_that(&Path::new(MANIFEST_PATH)).does_not_exist();
     }
 
     #[test]
