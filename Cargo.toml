@@ -1,6 +1,6 @@
 [package]
 name = "spectral"
-version = "0.4.1"
+version = "0.5.0"
 authors = ["cfrancia <cfrancia@users.noreply.github.com>"]
 license = "Apache-2.0"
 description = "Fluent test assertions"
