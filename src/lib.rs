@@ -388,11 +388,18 @@ impl<'r, T: DescriptiveSpec<'r>> AssertionFailure<'r, T> {
 }
 
 impl<'s, S> Spec<'s, S> {
+    /// Provides the actual location of the assertion.
+    ///
+    /// Usually you would not call this directly, but use the macro forms of `assert_that` and
+    /// `asserting`, which will call this on your behalf with the correct location.
     pub fn at_location(&mut self, location: String) -> &mut Self {
         self.location = Some(location);
         self
     }
 
+    /// Associates a name with the subject.
+    ///
+    /// This will be displayed if the assertion fails.
     pub fn named(&mut self, subject_name: &'s str) -> &mut Self {
         self.subject_name = Some(subject_name);
         self

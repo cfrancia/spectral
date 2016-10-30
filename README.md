@@ -71,6 +71,21 @@ Using the macro form of `assert_that!` will provide you with the file and line o
     at location: tests/parser.rs:112
 ```
 
+### Named Subjects
+
+To make it more obvious what your subject actually is, you can call `.named(...)` after `assert_that` (or `asserting(...).that(...)`), which will print out the provided `&str` as the subject name if the assertion fails.
+
+```
+assert_that(&thing.attributes).named(&"thing attributes").has_length(2);
+```
+
+On failure, this will display:
+```
+    for subject [thing attributes]
+    expected: vec to have length <2>
+     but was: <1>
+```
+
 ### Mapping values
 
 If you want to assert against a value contained within a struct, you can call `map(...)` with a closure, which will create a new `Spec` based upon the return value of the closure. You can then call any applicable assertions against the mapped value.
