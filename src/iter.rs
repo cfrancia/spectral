@@ -9,6 +9,8 @@ macro_rules! generate_iter_spec_trait {
             where T: Debug + PartialEq
             {
                 fn contains(&mut self, expected_value: &'s T);
+                fn contains_all_of<E: 's>(&mut self, expected_values_iter: &'s E)
+                    where E: IntoIterator<Item = &'s T> + Clone;
                 fn does_not_contain(&mut self, expected_value: &'s T);
                 fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E)
                     where E: Iterator<Item = &'s T> + Clone;
@@ -42,6 +44,21 @@ impl<'s, T: 's, I> ContainingIntoIterAssertions<'s, T> for Spec<'s, I>
     fn contains(&mut self, expected_value: &'s T) {
         let subject_iter = self.subject.into_iter();
         check_iterator_contains(self, subject_iter, &expected_value, true);
+    }
+
+    /// Asserts that the subject contains all of the provided values. The subject must implement
+    /// `IntoIterator`, and the contained type must implement `PartialEq` and `Debug`.
+    ///
+    /// ```rust,ignore
+    /// let test_vec = vec![1,2,3];
+    /// assert_that(&test_vec).contains_all_of(&vec![2, 3]);
+    /// ```
+    fn contains_all_of<E: 's>(&mut self, expected_values_iter: &'s E)
+        where E: IntoIterator<Item = &'s T> + Clone
+    {
+        let subject_iter = self.subject.into_iter();
+        let expected_iter = expected_values_iter.clone().into_iter();
+        check_iterator_contains_all_of(self, subject_iter, expected_iter);
     }
 
     /// Asserts that the subject does not contain the provided value. The subject must implement
@@ -86,6 +103,21 @@ impl<'s, T: 's, I> ContainingIteratorAssertions<'s, T> for Spec<'s, I>
     fn contains(&mut self, expected_value: &'s T) {
         let subject_iter = self.subject.clone();
         check_iterator_contains(self, subject_iter, &expected_value, true);
+    }
+
+    /// Asserts that the subject contains all of the provided values. The subject must implement
+    /// `Iterator`, and the contained type must implement `PartialEq` and `Debug`.
+    ///
+    /// ```rust,ignore
+    /// let test_vec = vec![1,2,3];
+    /// assert_that(&test_vec.iter()).contains_all_of(&vec![2, 3]);
+    /// ```
+    fn contains_all_of<E: 's>(&mut self, expected_values_iter: &'s E)
+        where E: IntoIterator<Item = &'s T> + Clone
+    {
+        let subject_iter = self.subject.clone();
+        let expected_iter = expected_values_iter.clone().into_iter();
+        check_iterator_contains_all_of(self, subject_iter, expected_iter);
     }
 
     /// Asserts that the iterable subject does not contain the provided value. The subject must
@@ -204,6 +236,50 @@ fn check_iterator_contains<T, V, I>(spec: &mut Spec<T>,
 
     if contains_value != should_contain {
         panic_unmatched(spec, expected_value, actual, should_contain);
+    }
+}
+
+fn check_iterator_contains_all_of<T, V, I, E>(spec: &mut Spec<T>,
+                                              actual_iter: I,
+                                              expected_values_iter: E)
+    where V: PartialEq + Debug,
+          I: Iterator<Item = V>,
+          E: Iterator<Item = V>
+{
+    let actual_values: Vec<V> = actual_iter.collect();
+
+    let mut matched_indexes = vec![];
+    let mut matched_indexes_holder = vec![];
+
+    let mut matched_values = vec![];
+    let mut unmatched_values = vec![];
+
+    'outer: for expected in expected_values_iter {
+        matched_indexes.append(&mut matched_indexes_holder);
+
+        for (index, actual) in actual_values.iter()
+            .enumerate()
+            .filter(|&(i, _)| !matched_indexes.contains(&i)) {
+            if expected.eq(actual) {
+                matched_indexes_holder.push(index);
+                matched_values.push(expected);
+                continue 'outer;
+            }
+        }
+
+        unmatched_values.push(expected);
+    }
+
+    if !unmatched_values.is_empty() {
+        let mut expected_values: Vec<V> = vec![];
+
+        expected_values.append(&mut matched_values);
+        expected_values.append(&mut unmatched_values);
+
+        AssertionFailure::from_spec(spec)
+            .with_expected(format!("iterator to contain items <{:?}>", expected_values))
+            .with_actual(format!("<{:?}>", actual_values))
+            .fail();
     }
 }
 
@@ -329,6 +405,50 @@ mod tests {
         test_into_iter.push_back(3);
 
         assert_that(&test_into_iter).contains(&5);
+    }
+
+    #[test]
+    fn should_not_panic_if_iterable_contains_all_expected_values() {
+        let mut test_into_iter = LinkedList::new();
+        test_into_iter.push_back(1);
+        test_into_iter.push_back(2);
+        test_into_iter.push_back(3);
+
+        assert_that(&test_into_iter).contains_all_of(&vec![&2, &3]);
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: iterator to contain items <[1, 6]>\
+                   \n\t but was: <[1, 2, 3]>")]
+    fn should_panic_if_iterable_does_not_contain_all_expected_values() {
+        let mut test_into_iter = LinkedList::new();
+        test_into_iter.push_back(1);
+        test_into_iter.push_back(2);
+        test_into_iter.push_back(3);
+
+        assert_that(&test_into_iter).contains_all_of(&vec![&1, &6]);
+    }
+
+    #[test]
+    fn should_not_panic_if_iterator_contains_all_expected_values() {
+        let test_vec = vec![1, 2, 3];
+        assert_that(&test_vec.iter()).contains_all_of(&vec![&2, &3]);
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: iterator to contain items <[1, 6]>\
+                   \n\t but was: <[1, 2, 3]>")]
+    fn should_panic_if_iterator_does_not_contain_all_expected_values() {
+        let test_vec = vec![1, 2, 3];
+        assert_that(&test_vec.iter()).contains_all_of(&vec![&1, &6]);
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: iterator to contain items <[1, 3, 1]>\
+                   \n\t but was: <[1, 2, 3]>")]
+    fn should_panic_if_iterator_does_not_contain_all_expected_values_exactly() {
+        let test_vec = vec![1, 2, 3];
+        assert_that(&test_vec.iter()).contains_all_of(&vec![&1, &1, &3]);
     }
 
     #[test]
