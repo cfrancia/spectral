@@ -72,6 +72,7 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
         if let Some(value) = subject.get(expected_key) {
             return Spec {
                 subject: value,
+                subject_name: self.subject_name,
                 location: self.location.clone(),
                 description: self.description,
             };

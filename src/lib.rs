@@ -176,6 +176,16 @@ extern crate num;
 
 #[macro_export]
 macro_rules! assert_that {
+    (&$subject:tt) => {
+        assert_that!($subject)
+    };
+    ($subject:tt) => {
+        {
+            let line = line!();
+            let file =  file!();
+            assert_that(&$subject).at_location(format!("{}:{}", file, line))
+        }
+    };
     (&$subject:ident$(.$additional_subject:ident)*) => {
         assert_that!($subject$(.$additional_subject)*)
     };
@@ -203,6 +213,7 @@ macro_rules! asserting {
 }
 
 pub trait DescriptiveSpec<'r> {
+    fn subject_name(&self) -> Option<&'r str>;
     fn location(&self) -> Option<String>;
     fn description(&self) -> Option<&'r str>;
 }
@@ -233,6 +244,7 @@ pub struct SpecDescription<'r> {
 #[derive(Debug)]
 pub struct Spec<'s, S: 's> {
     pub subject: &'s S,
+    pub subject_name: Option<&'s str>,
     pub location: Option<String>,
     pub description: Option<&'s str>,
 }
@@ -243,6 +255,7 @@ pub struct Spec<'s, S: 's> {
 pub fn assert_that<'s, S>(subject: &'s S) -> Spec<'s, S> {
     Spec {
         subject: subject,
+        subject_name: None,
         location: None,
         description: None,
     }
@@ -268,6 +281,7 @@ impl<'r> SpecDescription<'r> {
     pub fn that<S>(self, subject: &'r S) -> Spec<'r, S> {
         Spec {
             subject: subject,
+            subject_name: None,
             location: self.location,
             description: Some(self.value),
         }
@@ -275,6 +289,10 @@ impl<'r> SpecDescription<'r> {
 }
 
 impl<'r, T> DescriptiveSpec<'r> for Spec<'r, T> {
+    fn subject_name(&self) -> Option<&'r str> {
+        self.subject_name
+    }
+
     fn location(&self) -> Option<String> {
         self.location.clone()
     }
@@ -318,10 +336,12 @@ impl<'r, T: DescriptiveSpec<'r>> AssertionFailure<'r, T> {
         }
 
         let location = self.maybe_build_location();
+        let subject_name = self.maybe_build_subject_name();
         let description = self.maybe_build_description();
 
-        panic!(format!("{}\n\t{}expected: {}\n\t but was: {}{}\n{}",
+        panic!(format!("{}{}\n\t{}expected: {}\n\t but was: {}{}\n{}",
                        description,
+                       subject_name,
                        TERM_RED,
                        self.expected.clone().unwrap(),
                        self.actual.clone().unwrap(),
@@ -333,10 +353,12 @@ impl<'r, T: DescriptiveSpec<'r>> AssertionFailure<'r, T> {
     /// if present.
     fn fail_with_message(&mut self, message: String) {
         let location = self.maybe_build_location();
+        let subject_name = self.maybe_build_subject_name();
         let description = self.maybe_build_description();
 
-        panic!(format!("{}\n\t{}{}{}\n{}",
+        panic!(format!("{}{}\n\t{}{}{}\n{}",
                        description,
+                       subject_name,
                        TERM_RED,
                        message,
                        TERM_RESET,
@@ -356,11 +378,23 @@ impl<'r, T: DescriptiveSpec<'r>> AssertionFailure<'r, T> {
             None => "".to_string(),
         }
     }
+
+    fn maybe_build_subject_name(&self) -> String {
+        match self.spec.subject_name() {
+            Some(value) => format!("\n\t{}for subject [{}]{}", TERM_BOLD, value, TERM_RESET),
+            None => "".to_string(),
+        }
+    }
 }
 
 impl<'s, S> Spec<'s, S> {
     pub fn at_location(&mut self, location: String) -> &mut Self {
         self.location = Some(location);
+        self
+    }
+
+    pub fn named(&mut self, subject_name: &'s str) -> &mut Self {
+        self.subject_name = Some(subject_name);
         self
     }
 }
@@ -442,6 +476,7 @@ impl<'s, S> Spec<'s, S>
     {
         Spec {
             subject: mapping_function(self.subject),
+            subject_name: self.subject_name,
             location: self.location.clone(),
             description: self.description,
         }
@@ -481,6 +516,21 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected = "\n\texpected: <2>\n\t but was: <1>\
+                   \n\n\tat location: src/lib.rs:")]
+    fn should_contain_file_and_line_in_panic_for_assertions() {
+        assert_that!(&1).is_equal_to(&2);
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpectation failed for value <\"Hello\">\
+                   \n\n\tat location: src/lib.rs:")]
+    fn should_contain_file_and_line_for_assertions_if_message_is_provided() {
+        let value = "Hello";
+        assert_that!(&value).matches(|val| val.eq(&"Hi"));
+    }
+
+    #[test]
     #[should_panic(expected = "\n\ttest condition:\n\texpected: <2>\n\t but was: <1>\
                    \n\n\tat location: src/lib.rs:")]
     fn should_contain_file_and_line_in_panic_for_descriptive_assertions() {
@@ -493,6 +543,21 @@ mod tests {
     fn should_contain_file_and_line_for_descriptive_assertions_if_message_is_provided() {
         let value = "Hello";
         asserting!(&"closure").that(&value).matches(|val| val.eq(&"Hi"));
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\tfor subject [number one]\n\texpected: <2>\n\t but was: <1>\
+                   \n\n\tat location: src/lib.rs:")]
+    fn should_contain_subject_name_in_panic_for_assertions() {
+        assert_that!(&1).named(&"number one").is_equal_to(&2);
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\tfor subject [a word]\n\texpectation failed for value <\"Hello\">\
+                   \n\n\tat location: src/lib.rs:")]
+    fn should_contain_subject_name_in_panic_for_assertions_if_message_is_provided() {
+        let value = "Hello";
+        assert_that!(&value).named(&"a word").matches(|val| val.eq(&"Hi"));
     }
 
     #[test]
