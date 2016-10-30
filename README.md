@@ -9,7 +9,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-spectral = "0.4.0"
+spectral = "0.5.0"
 ```
 
 Then add this to your crate:
@@ -41,6 +41,8 @@ assert_that(&test_vec).has_length(3);
 
 The methods avaliable for asserting depend upon the type under test and what traits are implemented.
 
+As described below, it's recommended to use the macro form of `assert_that!` to provide correct file and line numbers for failing assertions.
+
 ### Failure messages
 
 For failing assertions, the usual panic message follows the following format:
@@ -61,6 +63,14 @@ Which will produce:
      but was: <1>
 ```
 
+Using the macro form of `assert_that!` will provide you with the file and line of the failing assertion as well:
+```
+    expected: vec to have length <2>
+     but was: <1>
+
+    at location: tests/parser.rs:112
+```
+
 ### Mapping values
 
 If you want to assert against a value contained within a struct, you can call `map(...)` with a closure, which will create a new `Spec` based upon the return value of the closure. You can then call any applicable assertions against the mapped value.
@@ -71,7 +81,7 @@ assert_that(&test_struct).map(|val| &val.value).is_equal_to(&5);
 
 ## Macros
 
-If you add `#[macro_use]` to the `extern crate` declaration, you can also use the macro form of `assert_that`.
+If you add `#[macro_use]` to the `extern crate` declaration, you can also use the macro form of `assert_that` and `asserting`.
 
 ```rust
 assert_that!(test_vec).has_length(5)
@@ -82,6 +92,8 @@ This allows you to pass through a subject to test without needing to deliberatel
 ```rust
 assert_that!(&test_vec).has_length(5)
 ```
+
+Additionally, this will provide you with the file and line number of the failing assertion (rather than just the internal spectral panic location).
 
 ## Assertions (Basic)
 
