@@ -93,6 +93,7 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
             &Ok(ref val) => {
                 Spec {
                     subject: val,
+                    location: self.location.clone(),
                     description: self.description,
                 }
             }
@@ -119,6 +120,7 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
             &Err(ref val) => {
                 Spec {
                     subject: val,
+                    location: self.location.clone(),
                     description: self.description,
                 }
             }

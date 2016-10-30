@@ -60,6 +60,7 @@ impl<'s, T> OptionAssertions<'s, T> for Spec<'s, Option<T>>
             &Some(ref val) => {
                 Spec {
                     subject: val,
+                    location: self.location.clone(),
                     description: self.description,
                 }
             }
