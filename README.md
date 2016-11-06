@@ -140,8 +140,8 @@ Note: Descriptions and examples for each of the assertions are further down in t
 ### Paths
 #### exists
 #### does_not_exist
-#### is_file
-#### is_directory
+#### is_a_file
+#### is_a_directory
 #### has_file_name
 
 ### Results
@@ -425,7 +425,7 @@ assert_that(&Path::new("/tmp/file").does_not_exist();
      but was: a resolvable Path
 ```
 
-#### is_file
+#### is_a_file
 
 Asserts that the subject `Path` refers to an existing file.
 
@@ -440,7 +440,7 @@ assert_that(&Path::new("/tmp/file").is_a_file();
 	 but was: not a resolvable file
 ```
 
-#### is_directory
+#### is_a_directory
 
 Asserts that the subject `Path` refers to an existing directory.
 
