@@ -401,7 +401,7 @@ Asserts that the subject `Path` refers to an existing location.
 
 ##### Example
 ```rust
-assert_that(&Path::new("/tmp/file").exists();
+assert_that(&Path::new("/tmp/file")).exists();
 ```
 
 ##### Failure Message
@@ -416,7 +416,7 @@ Asserts that the subject `Path` does not refer to an existing location.
 
 ##### Example
 ```rust
-assert_that(&Path::new("/tmp/file").does_not_exist();
+assert_that(&Path::new("/tmp/file")).does_not_exist();
 ```
 
 ##### Failure Message
@@ -431,7 +431,7 @@ Asserts that the subject `Path` refers to an existing file.
 
 ##### Example
 ```rust
-assert_that(&Path::new("/tmp/file").is_a_file();
+assert_that(&Path::new("/tmp/file")).is_a_file();
 ```
 
 ##### Failure Message
@@ -446,7 +446,7 @@ Asserts that the subject `Path` refers to an existing directory.
 
 ##### Example
 ```rust
-assert_that(&Path::new("/tmp/dir/").is_a_directory();
+assert_that(&Path::new("/tmp/dir/")).is_a_directory();
 ```
 
 ##### Failure Message
@@ -461,7 +461,7 @@ Asserts that the subject `Path` has the expected file name.
 
 ##### Example
 ```rust
-assert_that(&Path::new("/tmp/file").has_file_name(&"file");
+assert_that(&Path::new("/tmp/file")).has_file_name(&"file");
 ```
 
 ##### Failure Message
