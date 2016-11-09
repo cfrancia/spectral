@@ -139,6 +139,7 @@
 //! Now, this was just a simple example, and there's a number of features not demonstrated, but
 //! hopefully it's enough to start you off with writing assertions in your tests using Spectral.
 
+use std::borrow::Borrow;
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
@@ -415,12 +416,13 @@ impl<'s, S> Spec<'s, S>
     /// ```rust,ignore
     /// assert_that(&"hello").is_equal_to(&"hello");
     /// ```
-    pub fn is_equal_to(&mut self, expected: &S) -> &mut Self {
+    pub fn is_equal_to<E: Borrow<S>>(&mut self, expected: E) -> &mut Self {
         let subject = self.subject;
+        let borrowed_expected = expected.borrow();
 
-        if !subject.eq(expected) {
+        if !subject.eq(borrowed_expected) {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("<{:?}>", expected))
+                .with_expected(format!("<{:?}>", borrowed_expected))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -434,12 +436,13 @@ impl<'s, S> Spec<'s, S>
     /// ```rust,ignore
     /// assert_that(&"hello").is_not_equal_to(&"hello");
     /// ```
-    pub fn is_not_equal_to(&mut self, expected: &S) -> &mut Self {
+    pub fn is_not_equal_to<E: Borrow<S>>(&mut self, expected: E) -> &mut Self {
         let subject = self.subject;
+        let borrowed_expected = expected.borrow();
 
-        if subject.eq(expected) {
+        if subject.eq(borrowed_expected) {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("<{:?}> to not equal <{:?}>", subject, expected))
+                .with_expected(format!("<{:?}> to not equal <{:?}>", subject, borrowed_expected))
                 .with_actual(format!("equal"))
                 .fail();
         }
@@ -568,6 +571,13 @@ mod tests {
     }
 
     #[test]
+    fn is_equal_to_should_support_multiple_borrow_forms() {
+        assert_that(&1).is_equal_to(1);
+        assert_that(&1).is_equal_to(&mut 1);
+        assert_that(&1).is_equal_to(&1);
+    }
+
+    #[test]
     fn should_not_panic_on_equal_subjects() {
         assert_that(&1).is_equal_to(&1);
     }
@@ -576,6 +586,13 @@ mod tests {
     #[should_panic(expected = "\n\texpected: <2>\n\t but was: <1>")]
     fn should_panic_on_unequal_subjects() {
         assert_that(&1).is_equal_to(&2);
+    }
+
+    #[test]
+    fn is_not_equal_to_should_support_multiple_borrow_forms() {
+        assert_that(&1).is_not_equal_to(2);
+        assert_that(&1).is_not_equal_to(&mut 2);
+        assert_that(&1).is_not_equal_to(&2);
     }
 
     #[test]
