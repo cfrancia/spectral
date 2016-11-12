@@ -11,16 +11,18 @@ pub trait ResultAssertions<'s, T, E>
 }
 
 pub trait ContainingResultAssertions<T, E>
-    where T: Debug + PartialEq,
-          E: Debug + PartialEq
+    where T: Debug,
+          E: Debug
 {
-    fn is_ok_containing(&mut self, expected_value: &T);
-    fn is_err_containing(&mut self, expected_value: &E);
+    fn is_ok_containing(&mut self, expected_value: &T)
+        where T: PartialEq;
+    fn is_err_containing(&mut self, expected_value: &E)
+        where E: PartialEq;
 }
 
 impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
-    where T: Debug + PartialEq,
-          E: Debug + PartialEq
+    where T: Debug,
+          E: Debug
 {
     /// Asserts that the subject is an `Ok` Result containing the expected value.
     /// The subject type must be a `Result`.
@@ -28,7 +30,9 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
     /// ```rust,ignore
     /// assert_that(&Result::Ok::<usize, usize>(1)).is_ok_containing(&1);
     /// ```
-    fn is_ok_containing(&mut self, expected_value: &T) {
+    fn is_ok_containing(&mut self, expected_value: &T)
+        where T: PartialEq
+    {
         match self.subject {
             &Ok(ref val) => {
                 if !val.eq(expected_value) {
@@ -53,7 +57,9 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
     /// ```rust,ignore
     /// assert_that(&Result::Err::<usize, usize>(1)).is_err_containing(&1);
     /// ```
-    fn is_err_containing(&mut self, expected_value: &E) {
+    fn is_err_containing(&mut self, expected_value: &E)
+        where E: PartialEq
+    {
         match self.subject {
             &Err(ref val) => {
                 if !val.eq(expected_value) {
@@ -188,6 +194,14 @@ mod tests {
     }
 
     #[test]
+    fn should_not_panic_if_result_is_ok_with_uncomparable_ok() {
+        #[derive(Debug)]
+        struct Incomporable;
+        let result: Result<&str, Incomporable> = Ok("Hello");
+        assert_that(&result).is_ok_containing(&"Hello");
+    }
+
+    #[test]
     #[should_panic(expected = "\n\texpected: Result[ok] containing <\"Hi\">\
                    \n\t but was: Result[ok] containing <\"Hello\">")]
     fn should_panic_if_result_is_ok_without_expected_value() {
@@ -206,6 +220,14 @@ mod tests {
     #[test]
     fn should_not_panic_if_result_is_err_with_expected_value() {
         let result: Result<&str, &str> = Err("Oh no");
+        assert_that(&result).is_err_containing(&"Oh no");
+    }
+
+    #[test]
+    fn should_not_panic_if_result_is_err_with_uncomparable_ok() {
+        #[derive(Debug)]
+        struct Incomporable;
+        let result: Result<Incomporable, &str> = Err("Oh no");
         assert_that(&result).is_err_containing(&"Oh no");
     }
 
