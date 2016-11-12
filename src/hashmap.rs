@@ -1,5 +1,6 @@
 use super::{AssertionFailure, Spec};
 
+use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -7,10 +8,12 @@ use std::hash::Hash;
 pub trait HashMapAssertions<'s, K: Hash + Eq, V: PartialEq> {
     fn has_length(&mut self, expected: usize);
     fn is_empty(&mut self);
-    fn contains_key(&mut self, expected_key: &K) -> Spec<'s, V>;
-    fn does_not_contain_key(&mut self, expected_key: &K);
-    fn contains_entry(&mut self, expected_key: &K, expected_value: &V);
-    fn does_not_contain_entry(&mut self, expected_key: &K, expected_value: &V);
+    fn contains_key<E: Borrow<K>>(&mut self, expected_key: E) -> Spec<'s, V>;
+    fn does_not_contain_key<E: Borrow<K>>(&mut self, expected_key: E);
+    fn contains_entry<E: Borrow<K>, F: Borrow<V>>(&mut self, expected_key: E, expected_value: F);
+    fn does_not_contain_entry<E: Borrow<K>, F: Borrow<V>>(&mut self,
+                                                          expected_key: E,
+                                                          expected_value: F);
 }
 
 impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
@@ -66,10 +69,11 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
     ///
     /// assert_that(&test_map).contains_key(&"hello");
     /// ```
-    fn contains_key(&mut self, expected_key: &K) -> Spec<'s, V> {
+    fn contains_key<E: Borrow<K>>(&mut self, expected_key: E) -> Spec<'s, V> {
         let subject = self.subject;
+        let borrowed_expected_key = expected_key.borrow();
 
-        if let Some(value) = subject.get(expected_key) {
+        if let Some(value) = subject.get(borrowed_expected_key) {
             return Spec {
                 subject: value,
                 subject_name: self.subject_name,
@@ -81,7 +85,7 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
         let subject_keys: Vec<&K> = subject.keys().collect();
 
         AssertionFailure::from_spec(self)
-            .with_expected(format!("hashmap to contain key <{:?}>", expected_key))
+            .with_expected(format!("hashmap to contain key <{:?}>", borrowed_expected_key))
             .with_actual(format!("<{:?}>", subject_keys))
             .fail();
 
@@ -97,12 +101,13 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
     ///
     /// assert_that(&test_map).does_not_contain_key(&"hey");
     /// ```
-    fn does_not_contain_key(&mut self, expected_key: &K) {
+    fn does_not_contain_key<E: Borrow<K>>(&mut self, expected_key: E) {
         let subject = self.subject;
+        let borrowed_expected_key = expected_key.borrow();
 
-        if subject.get(expected_key).is_some() {
+        if subject.get(borrowed_expected_key).is_some() {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("hashmap to not contain key <{:?}>", expected_key))
+                .with_expected(format!("hashmap to not contain key <{:?}>", borrowed_expected_key))
                 .with_actual(format!("present in hashmap"))
                 .fail();
         }
@@ -117,20 +122,25 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
     ///
     /// assert_that(&test_map).contains_entry(&"hello", &"hi");
     /// ```
-    fn contains_entry(&mut self, expected_key: &K, expected_value: &V) {
-        let expected_message = format!("hashmap containing key <{:?}> with value <{:?}>",
-                                       expected_key,
-                                       expected_value);
+    fn contains_entry<E: Borrow<K>, F: Borrow<V>>(&mut self, expected_key: E, expected_value: F) {
         let subject = self.subject;
+        let borrowed_expected_key = expected_key.borrow();
+        let borrowed_expected_value = expected_value.borrow();
 
-        if let Some(value) = subject.get(expected_key) {
-            if value.eq(expected_value) {
+        let expected_message = format!("hashmap containing key <{:?}> with value <{:?}>",
+                                       borrowed_expected_key,
+                                       borrowed_expected_value);
+
+        if let Some(value) = subject.get(borrowed_expected_key) {
+            if value.eq(borrowed_expected_value) {
                 return;
             }
 
             AssertionFailure::from_spec(self)
                 .with_expected(expected_message)
-                .with_actual(format!("key <{:?}> with value <{:?}> instead", expected_key, value))
+                .with_actual(format!("key <{:?}> with value <{:?}> instead",
+                                     borrowed_expected_key,
+                                     value))
                 .fail();
 
             unreachable!();
@@ -154,18 +164,22 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
     ///
     /// assert_that(&test_map).does_not_contain_entry(&"hello", &"hey");
     /// ```
-    fn does_not_contain_entry(&mut self, expected_key: &K, expected_value: &V) {
+    fn does_not_contain_entry<E: Borrow<K>, F: Borrow<V>>(&mut self,
+                                                          expected_key: E,
+                                                          expected_value: F) {
         let subject = self.subject;
+        let borrowed_expected_key = expected_key.borrow();
+        let borrowed_expected_value = expected_value.borrow();
 
-        if let Some(value) = subject.get(expected_key) {
-            if !value.eq(expected_value) {
+        if let Some(value) = subject.get(borrowed_expected_key) {
+            if !value.eq(borrowed_expected_value) {
                 return;
             }
 
             AssertionFailure::from_spec(self)
                 .with_expected(format!("hashmap to not contain key <{:?}> with value <{:?}>",
-                                       expected_key,
-                                       expected_value))
+                                       borrowed_expected_key,
+                                       borrowed_expected_value))
                 .with_actual(format!("present in hashmap"))
                 .fail();
         }
@@ -215,6 +229,16 @@ mod tests {
     }
 
     #[test]
+    fn contains_key_should_allow_multiple_borrow_forms() {
+        let mut test_map = HashMap::new();
+        test_map.insert("hello", "hi");
+
+        assert_that(&test_map).contains_key("hello");
+        assert_that(&test_map).contains_key(&mut "hello");
+        assert_that(&test_map).contains_key(&"hello");
+    }
+
+    #[test]
     fn should_not_panic_if_hashmap_contains_key() {
         let mut test_map = HashMap::new();
         test_map.insert("hello", "hi");
@@ -243,6 +267,16 @@ mod tests {
     }
 
     #[test]
+    fn does_not_contain_key_should_allow_multiple_borrow_forms() {
+        let mut test_map = HashMap::new();
+        test_map.insert("hello", "hi");
+
+        assert_that(&test_map).does_not_contain_key("hey");
+        assert_that(&test_map).does_not_contain_key(&mut "hey");
+        assert_that(&test_map).does_not_contain_key(&"hey");
+    }
+
+    #[test]
     fn should_not_panic_if_hashmap_does_not_contain_key_when_expected() {
         let mut test_map = HashMap::new();
         test_map.insert("hello", "hi");
@@ -258,6 +292,17 @@ mod tests {
         test_map.insert("hello", "hi");
 
         assert_that(&test_map).does_not_contain_key(&"hello");
+    }
+
+    #[test]
+    fn contains_entry_should_allow_multiple_borrow_forms() {
+        let mut test_map = HashMap::new();
+        test_map.insert("hello", "hi");
+
+        assert_that(&test_map).contains_entry("hello", "hi");
+        assert_that(&test_map).contains_entry(&mut "hello", &mut "hi");
+        assert_that(&test_map).contains_entry("hello", &mut "hi");
+        assert_that(&test_map).contains_entry(&"hello", &"hi");
     }
 
     #[test]
