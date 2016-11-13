@@ -1,5 +1,6 @@
 use super::{AssertionFailure, Spec};
 
+use std::borrow::Borrow;
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
@@ -13,7 +14,7 @@ pub trait OptionAssertions<'r, T>
 pub trait ContainingOptionAssertions<T>
     where T: Debug + PartialEq
 {
-    fn contains_value(&mut self, expected_value: &T);
+    fn contains_value<E: Borrow<T>>(&mut self, expected_value: E);
 }
 
 impl<'s, T> ContainingOptionAssertions<T> for Spec<'s, Option<T>>
@@ -25,19 +26,22 @@ impl<'s, T> ContainingOptionAssertions<T> for Spec<'s, Option<T>>
     /// ```rust,ignore
     /// assert_that(&Some(1)).contains_value(&1);
     /// ```
-    fn contains_value(&mut self, expected_value: &T) {
+    fn contains_value<E: Borrow<T>>(&mut self, expected_value: E) {
+        let borrowed_expected_value = expected_value.borrow();
+
         match *self.subject {
             Some(ref val) => {
-                if !val.eq(expected_value) {
+                if !val.eq(borrowed_expected_value) {
                     AssertionFailure::from_spec(self)
-                        .with_expected(format!("option to contain <{:?}>", expected_value))
+                        .with_expected(format!("option to contain <{:?}>",
+                                               borrowed_expected_value))
                         .with_actual(format!("<{:?}>", val))
                         .fail();
                 }
             }
             None => {
                 AssertionFailure::from_spec(self)
-                    .with_expected(format!("option<{:?}>", expected_value))
+                    .with_expected(format!("option<{:?}>", borrowed_expected_value))
                     .with_actual(format!("option[none]"))
                     .fail();
             }
@@ -116,6 +120,14 @@ mod tests {
     fn should_be_able_to_unwrap_option_if_some() {
         let option = Some("Hello");
         assert_that(&option).is_some().is_equal_to(&"Hello");
+    }
+
+    #[test]
+    fn contains_value_should_allow_multiple_borrow_types() {
+        let option = Some("Hello");
+        assert_that(&option).contains_value("Hello");
+        assert_that(&option).contains_value(&mut "Hello");
+        assert_that(&option).contains_value(&"Hello");
     }
 
     #[test]
