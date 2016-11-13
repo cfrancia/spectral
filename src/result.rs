@@ -1,5 +1,6 @@
 use super::{AssertionFailure, Spec};
 
+use std::borrow::Borrow;
 use std::fmt::Debug;
 
 pub trait ResultAssertions<'s, T, E>
@@ -14,8 +15,8 @@ pub trait ContainingResultAssertions<T, E>
     where T: Debug,
           E: Debug
 {
-    fn is_ok_containing(&mut self, expected_value: &T) where T: PartialEq;
-    fn is_err_containing(&mut self, expected_value: &E) where E: PartialEq;
+    fn is_ok_containing<V: Borrow<T>>(&mut self, expected_value: V) where T: PartialEq;
+    fn is_err_containing<V: Borrow<E>>(&mut self, expected_value: V) where E: PartialEq;
 }
 
 impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
@@ -28,21 +29,23 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
     /// ```rust,ignore
     /// assert_that(&Result::Ok::<usize, usize>(1)).is_ok_containing(&1);
     /// ```
-    fn is_ok_containing(&mut self, expected_value: &T)
+    fn is_ok_containing<V: Borrow<T>>(&mut self, expected_value: V)
         where T: PartialEq
     {
+        let borrowed_expected_value = expected_value.borrow();
+
         match *self.subject {
             Ok(ref val) => {
-                if !val.eq(expected_value) {
+                if !val.eq(borrowed_expected_value) {
                     AssertionFailure::from_spec(self)
-                        .with_expected(build_detail_message("ok", expected_value))
+                        .with_expected(build_detail_message("ok", borrowed_expected_value))
                         .with_actual(build_detail_message("ok", val))
                         .fail();
                 }
             }
             Err(ref val) => {
                 AssertionFailure::from_spec(self)
-                    .with_expected(build_detail_message("ok", expected_value))
+                    .with_expected(build_detail_message("ok", borrowed_expected_value))
                     .with_actual(build_detail_message("err", val))
                     .fail();
             }
@@ -55,21 +58,23 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
     /// ```rust,ignore
     /// assert_that(&Result::Err::<usize, usize>(1)).is_err_containing(&1);
     /// ```
-    fn is_err_containing(&mut self, expected_value: &E)
+    fn is_err_containing<V: Borrow<E>>(&mut self, expected_value: V)
         where E: PartialEq
     {
+        let borrowed_expected_value = expected_value.borrow();
+
         match *self.subject {
             Err(ref val) => {
-                if !val.eq(expected_value) {
+                if !val.eq(borrowed_expected_value) {
                     AssertionFailure::from_spec(self)
-                        .with_expected(build_detail_message("err", expected_value))
+                        .with_expected(build_detail_message("err", borrowed_expected_value))
                         .with_actual(build_detail_message("err", val))
                         .fail();
                 }
             }
             Ok(ref val) => {
                 AssertionFailure::from_spec(self)
-                    .with_expected(build_detail_message("err", expected_value))
+                    .with_expected(build_detail_message("err", borrowed_expected_value))
                     .with_actual(build_detail_message("ok", val))
                     .fail();
             }
@@ -186,6 +191,14 @@ mod tests {
     }
 
     #[test]
+    fn is_ok_containing_should_allow_multiple_borrow_forms() {
+        let result: Result<&str, &str> = Ok("Hello");
+        assert_that(&result).is_ok_containing("Hello");
+        assert_that(&result).is_ok_containing(&mut "Hello");
+        assert_that(&result).is_ok_containing(&"Hello");
+    }
+
+    #[test]
     fn should_not_panic_if_result_is_ok_with_expected_value() {
         let result: Result<&str, &str> = Ok("Hello");
         assert_that(&result).is_ok_containing(&"Hello");
@@ -194,8 +207,8 @@ mod tests {
     #[test]
     fn should_not_panic_if_result_is_ok_with_uncomparable_ok() {
         #[derive(Debug)]
-        struct Incomporable;
-        let result: Result<&str, Incomporable> = Ok("Hello");
+        struct Incomparable;
+        let result: Result<&str, Incomparable> = Ok("Hello");
         assert_that(&result).is_ok_containing(&"Hello");
     }
 
@@ -216,6 +229,14 @@ mod tests {
     }
 
     #[test]
+    fn is_error_containing_should_allow_multiple_borrow_forms() {
+        let result: Result<&str, &str> = Err("Oh no");
+        assert_that(&result).is_err_containing("Oh no");
+        assert_that(&result).is_err_containing(&mut "Oh no");
+        assert_that(&result).is_err_containing(&"Oh no");
+    }
+
+    #[test]
     fn should_not_panic_if_result_is_err_with_expected_value() {
         let result: Result<&str, &str> = Err("Oh no");
         assert_that(&result).is_err_containing(&"Oh no");
@@ -224,8 +245,8 @@ mod tests {
     #[test]
     fn should_not_panic_if_result_is_err_with_uncomparable_ok() {
         #[derive(Debug)]
-        struct Incomporable;
-        let result: Result<Incomporable, &str> = Err("Oh no");
+        struct Incomparable;
+        let result: Result<Incomparable, &str> = Err("Oh no");
         assert_that(&result).is_err_containing(&"Oh no");
     }
 
