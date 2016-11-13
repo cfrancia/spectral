@@ -1,9 +1,11 @@
 use super::{AssertionFailure, Spec};
 
+use std::borrow::Borrow;
+
 pub trait StrAssertions {
-    fn starts_with(&mut self, expected: &str);
-    fn ends_with(&mut self, expected: &str);
-    fn contains(&mut self, expected: &str);
+    fn starts_with<'r, E: Borrow<&'r str>>(&mut self, expected: E);
+    fn ends_with<'r, E: Borrow<&'r str>>(&mut self, expected: E);
+    fn contains<'r, E: Borrow<&'r str>>(&mut self, expected: E);
 }
 
 impl<'s> StrAssertions for Spec<'s, &'s str> {
@@ -12,12 +14,13 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// ```rust,ignore
     /// assert_that(&"Hello").starts_with(&"H");
     /// ```
-    fn starts_with(&mut self, expected: &str) {
+    fn starts_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
         let subject = self.subject;
+        let borrowed_expected = expected.borrow();
 
-        if !subject.starts_with(expected) {
+        if !subject.starts_with(borrowed_expected) {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("string starting with <{:?}>", expected))
+                .with_expected(format!("string starting with <{:?}>", borrowed_expected))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -28,12 +31,13 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// ```rust,ignore
     /// assert_that(&"Hello").ends_with(&"o");
     /// ```
-    fn ends_with(&mut self, expected: &str) {
+    fn ends_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
         let subject = self.subject;
+        let borrowed_expected = expected.borrow();
 
-        if !subject.ends_with(expected) {
+        if !subject.ends_with(borrowed_expected) {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("string ending with <{:?}>", expected))
+                .with_expected(format!("string ending with <{:?}>", borrowed_expected))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -44,12 +48,13 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// ```rust,ignore
     /// assert_that(&"Hello").contains(&"e");
     /// ```
-    fn contains(&mut self, expected: &str) {
+    fn contains<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
         let subject = self.subject;
+        let borrowed_expected = expected.borrow();
 
-        if !subject.contains(expected) {
+        if !subject.contains(borrowed_expected) {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("string containing <{:?}>", expected))
+                .with_expected(format!("string containing <{:?}>", borrowed_expected))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -60,6 +65,22 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
 mod tests {
 
     use super::super::prelude::*;
+
+    #[test]
+    fn should_allow_multiple_borrow_forms() {
+        let value = "Hello";
+        assert_that(&value).starts_with("H");
+        assert_that(&value).starts_with(&mut "H");
+        assert_that(&value).starts_with(&"H");
+
+        assert_that(&value).ends_with("o");
+        assert_that(&value).ends_with(&mut "o");
+        assert_that(&value).ends_with(&"o");
+
+        assert_that(&value).contains("l");
+        assert_that(&value).contains(&mut "l");
+        assert_that(&value).contains(&"l");
+    }
 
     #[test]
     fn should_not_panic_if_str_starts_with_value() {
