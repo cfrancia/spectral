@@ -262,7 +262,7 @@ pub fn assert_that<'s, S>(subject: &'s S) -> Spec<'s, S> {
 }
 
 /// Describes an assertion.
-pub fn asserting<'r>(description: &'r str) -> SpecDescription {
+pub fn asserting(description: &str) -> SpecDescription {
     SpecDescription {
         value: description,
         location: None,

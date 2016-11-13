@@ -176,7 +176,7 @@ impl<'s, T: 's, I> MappingIterAssertions<'s, T> for Spec<'s, I>
         let subject = self.subject;
 
         let mapped_vec: Vec<M> = subject.into_iter().map(mapping_function).collect();
-        if mapped_vec.contains(&expected_value) {
+        if mapped_vec.contains(expected_value) {
             return;
         }
 

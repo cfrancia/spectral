@@ -100,7 +100,7 @@ impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
     fn does_not_contain_key(&mut self, expected_key: &K) {
         let subject = self.subject;
 
-        if let Some(_) = subject.get(expected_key) {
+        if subject.get(expected_key).is_some() {
             AssertionFailure::from_spec(self)
                 .with_expected(format!("hashmap to not contain key <{:?}>", expected_key))
                 .with_actual(format!("present in hashmap"))

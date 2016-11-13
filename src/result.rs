@@ -33,8 +33,8 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
     fn is_ok_containing(&mut self, expected_value: &T)
         where T: PartialEq
     {
-        match self.subject {
-            &Ok(ref val) => {
+        match *self.subject {
+            Ok(ref val) => {
                 if !val.eq(expected_value) {
                     AssertionFailure::from_spec(self)
                         .with_expected(build_detail_message("ok", expected_value))
@@ -42,7 +42,7 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
                         .fail();
                 }
             }
-            &Err(ref val) => {
+            Err(ref val) => {
                 AssertionFailure::from_spec(self)
                     .with_expected(build_detail_message("ok", expected_value))
                     .with_actual(build_detail_message("err", val))
@@ -60,8 +60,8 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
     fn is_err_containing(&mut self, expected_value: &E)
         where E: PartialEq
     {
-        match self.subject {
-            &Err(ref val) => {
+        match *self.subject {
+            Err(ref val) => {
                 if !val.eq(expected_value) {
                     AssertionFailure::from_spec(self)
                         .with_expected(build_detail_message("err", expected_value))
@@ -69,7 +69,7 @@ impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
                         .fail();
                 }
             }
-            &Ok(ref val) => {
+            Ok(ref val) => {
                 AssertionFailure::from_spec(self)
                     .with_expected(build_detail_message("err", expected_value))
                     .with_actual(build_detail_message("ok", val))
@@ -95,8 +95,8 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
     /// assert_that(&Result::Ok::<usize, usize>(1)).is_ok();
     /// ```
     fn is_ok(&mut self) -> Spec<'s, T> {
-        return match self.subject {
-            &Ok(ref val) => {
+        match *self.subject {
+            Ok(ref val) => {
                 Spec {
                     subject: val,
                     subject_name: self.subject_name,
@@ -104,7 +104,7 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
                     description: self.description,
                 }
             }
-            &Err(ref err) => {
+            Err(ref err) => {
                 AssertionFailure::from_spec(self)
                     .with_expected(format!("result[ok]"))
                     .with_actual(format!("result[error]<{:?}>", err))
@@ -112,7 +112,7 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
 
                 unreachable!();
             }
-        };
+        }
     }
 
     /// Asserts that the subject is `Err`. The value type must be a `Result`.
@@ -123,8 +123,8 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
     /// assert_that(&Result::Err::<usize, usize>(1)).is_error();
     /// ```
     fn is_error(&mut self) -> Spec<'s, E> {
-        return match self.subject {
-            &Err(ref val) => {
+        match *self.subject {
+            Err(ref val) => {
                 Spec {
                     subject: val,
                     subject_name: self.subject_name,
@@ -132,7 +132,7 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
                     description: self.description,
                 }
             }
-            &Ok(ref val) => {
+            Ok(ref val) => {
                 AssertionFailure::from_spec(self)
                     .with_expected(format!("result[error]"))
                     .with_actual(format!("result[ok]<{:?}>", val))
@@ -140,7 +140,7 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
 
                 unreachable!();
             }
-        };
+        }
     }
 }
 

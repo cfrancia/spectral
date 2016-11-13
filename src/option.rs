@@ -26,8 +26,8 @@ impl<'s, T> ContainingOptionAssertions<T> for Spec<'s, Option<T>>
     /// assert_that(&Some(1)).contains_value(&1);
     /// ```
     fn contains_value(&mut self, expected_value: &T) {
-        match self.subject {
-            &Some(ref val) => {
+        match *self.subject {
+            Some(ref val) => {
                 if !val.eq(expected_value) {
                     AssertionFailure::from_spec(self)
                         .with_expected(format!("option to contain <{:?}>", expected_value))
@@ -35,7 +35,7 @@ impl<'s, T> ContainingOptionAssertions<T> for Spec<'s, Option<T>>
                         .fail();
                 }
             }
-            &None => {
+            None => {
                 AssertionFailure::from_spec(self)
                     .with_expected(format!("option<{:?}>", expected_value))
                     .with_actual(format!("option[none]"))
@@ -56,8 +56,8 @@ impl<'s, T> OptionAssertions<'s, T> for Spec<'s, Option<T>>
     /// assert_that(&Some(1)).is_some();
     /// ```
     fn is_some(&mut self) -> Spec<'s, T> {
-        return match self.subject {
-            &Some(ref val) => {
+        match *self.subject {
+            Some(ref val) => {
                 Spec {
                     subject: val,
                     subject_name: self.subject_name,
@@ -65,7 +65,7 @@ impl<'s, T> OptionAssertions<'s, T> for Spec<'s, Option<T>>
                     description: self.description,
                 }
             }
-            &None => {
+            None => {
                 AssertionFailure::from_spec(self)
                     .with_expected(format!("option[some]"))
                     .with_actual(format!("option[none]"))
@@ -73,7 +73,7 @@ impl<'s, T> OptionAssertions<'s, T> for Spec<'s, Option<T>>
 
                 unreachable!();
             }
-        };
+        }
     }
 
     /// Asserts that the subject is `None`. The value type must be an `Option`.
@@ -82,15 +82,15 @@ impl<'s, T> OptionAssertions<'s, T> for Spec<'s, Option<T>>
     /// assert_that(&Option::None::<String>).is_none();
     /// ```
     fn is_none(&mut self) {
-        match self.subject {
-            &None => (),
-            &Some(ref val) => {
+        match *self.subject {
+            None => (),
+            Some(ref val) => {
                 AssertionFailure::from_spec(self)
                     .with_expected(format!("option[none]"))
                     .with_actual(format!("option<{:?}>", val))
                     .fail();
             }
-        };
+        }
     }
 }
 
