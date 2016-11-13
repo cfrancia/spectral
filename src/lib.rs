@@ -420,7 +420,7 @@ impl<'s, S> Spec<'s, S>
     /// ```rust,ignore
     /// assert_that(&"hello").is_equal_to(&"hello");
     /// ```
-    pub fn is_equal_to<E: Borrow<S>>(&mut self, expected: E) -> &mut Self {
+    pub fn is_equal_to<E: Borrow<S>>(&mut self, expected: E) {
         let subject = self.subject;
         let borrowed_expected = expected.borrow();
 
@@ -430,8 +430,6 @@ impl<'s, S> Spec<'s, S>
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
-
-        self
     }
 
     /// Asserts that the actual value and the expected value are not equal. The value type must
@@ -440,7 +438,7 @@ impl<'s, S> Spec<'s, S>
     /// ```rust,ignore
     /// assert_that(&"hello").is_not_equal_to(&"hello");
     /// ```
-    pub fn is_not_equal_to<E: Borrow<S>>(&mut self, expected: E) -> &mut Self {
+    pub fn is_not_equal_to<E: Borrow<S>>(&mut self, expected: E) {
         let subject = self.subject;
         let borrowed_expected = expected.borrow();
 
@@ -450,8 +448,6 @@ impl<'s, S> Spec<'s, S>
                 .with_actual(format!("equal"))
                 .fail();
         }
-
-        self
     }
 }
 
