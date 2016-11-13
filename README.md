@@ -9,7 +9,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-spectral = "0.5.0"
+spectral = "0.5.1"
 ```
 
 Then add this to your crate:
