@@ -495,21 +495,23 @@ assert_that(&result).is_ok().is_equal_to(&"Hello");
 	 but was: result[error]<"Oh no">
 ```
 
-#### is_error -> (returns a new Spec with the Err value)
+#### is_err -> (returns a new Spec with the Err value)
 
 Asserts that the subject is `Err`. The value type must be a `Result`.
 
 This will return a new `Spec` containing the unwrapped value if it is `Err`.
 
+Note: This used to be called `is_error`, but has been renamed to match standard Rust naming.
+
 ##### Example
 ```rust
-assert_that(&Result::Err::<usize, usize>(1)).is_error();
+assert_that(&Result::Err::<usize, usize>(1)).is_err();
 ```
 
 ##### Chaining
 ```rust
 let result: Result<&str, &str> = Err("Hello");
-assert_that(&result).is_error().is_equal_to(&"Hello");
+assert_that(&result).is_err().is_equal_to(&"Hello");
 ```
 
 ##### Failure Message

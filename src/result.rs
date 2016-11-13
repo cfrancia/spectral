@@ -8,6 +8,9 @@ pub trait ResultAssertions<'s, T, E>
           E: Debug
 {
     fn is_ok(&mut self) -> Spec<'s, T>;
+    fn is_err(&mut self) -> Spec<'s, E>;
+
+    #[deprecated(since="0.5.1", note="Please use `is_err` instead as a direct replacement")]
     fn is_error(&mut self) -> Spec<'s, E>;
 }
 
@@ -123,9 +126,9 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
     /// This will return a new `Spec` containing the unwrapped value if it is `Err`.
     ///
     /// ```rust,ignore
-    /// assert_that(&Result::Err::<usize, usize>(1)).is_error();
+    /// assert_that(&Result::Err::<usize, usize>(1)).is_err();
     /// ```
-    fn is_error(&mut self) -> Spec<'s, E> {
+    fn is_err(&mut self) -> Spec<'s, E> {
         match *self.subject {
             Err(ref val) => {
                 Spec {
@@ -144,6 +147,19 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
                 unreachable!();
             }
         }
+    }
+
+    /// DEPRECATED: Use `is_err` instead to match standard Rust naming conventions.
+    ///
+    /// Asserts that the subject is `Err`. The value type must be a `Result`.
+    ///
+    /// This will return a new `Spec` containing the unwrapped value if it is `Err`.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&Result::Err::<usize, usize>(1)).is_error();
+    /// ```
+    fn is_error(&mut self) -> Spec<'s, E> {
+        self.is_err()
     }
 }
 
@@ -172,22 +188,28 @@ mod tests {
     }
 
     #[test]
-    fn should_not_panic_if_result_is_expected_to_be_error_and_is() {
+    fn should_still_support_deprecated_is_error() {
         let result: Result<&str, &str> = Err("Oh no");
         assert_that(&result).is_error();
+    }
+
+    #[test]
+    fn should_not_panic_if_result_is_expected_to_be_error_and_is() {
+        let result: Result<&str, &str> = Err("Oh no");
+        assert_that(&result).is_err();
     }
 
     #[test]
     #[should_panic(expected = "\n\texpected: result[error]\n\t but was: result[ok]<\"Hello\">")]
     fn should_panic_if_result_is_expected_to_be_error_and_is_not() {
         let result: Result<&str, &str> = Ok("Hello");
-        assert_that(&result).is_error();
+        assert_that(&result).is_err();
     }
 
     #[test]
     fn should_return_unwrapped_value_if_subject_is_err() {
         let result: Result<&str, &str> = Err("Hello");
-        assert_that(&result).is_error().is_equal_to(&"Hello");
+        assert_that(&result).is_err().is_equal_to(&"Hello");
     }
 
     #[test]
