@@ -1,5 +1,6 @@
 use super::{AssertionFailure, Spec};
 
+use std::borrow::Borrow;
 use std::path::Path;
 
 pub trait PathAssertions {
@@ -7,7 +8,7 @@ pub trait PathAssertions {
     fn does_not_exist(&mut self);
     fn is_a_file(&mut self);
     fn is_a_directory(&mut self);
-    fn has_file_name(&mut self, expected_file_name: &str);
+    fn has_file_name<'r, E: Borrow<&'r str>>(&mut self, expected_file_name: E);
 }
 
 impl<'s> PathAssertions for Spec<'s, &'s Path> {
@@ -76,8 +77,9 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
     /// ```rust,ignore
     /// assert_that(&Path::new("/tmp/file").has_file_name(&"file");
     /// ```
-    fn has_file_name(&mut self, expected_file_name: &str) {
+    fn has_file_name<'r, E: Borrow<&'r str>>(&mut self, expected_file_name: E) {
         let subject = self.subject;
+        let borrowed_expected_file_name: &str = expected_file_name.borrow();
 
         let subject_file_name = match subject.file_name() {
             Some(os_string) => {
@@ -85,7 +87,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
                     Some(val) => val,
                     None => {
                         AssertionFailure::from_spec(self)
-                            .with_expected(build_file_name_message(expected_file_name))
+                            .with_expected(build_file_name_message(borrowed_expected_file_name))
                             .with_actual(format!("an invalid UTF-8 file name"))
                             .fail();
 
@@ -95,7 +97,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
             }
             None => {
                 AssertionFailure::from_spec(self)
-                    .with_expected(build_file_name_message(expected_file_name))
+                    .with_expected(build_file_name_message(borrowed_expected_file_name))
                     .with_actual(format!("a non-resolvable path <{:?}>", subject))
                     .fail();
 
@@ -103,9 +105,9 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
             }
         };
 
-        if !subject_file_name.eq(expected_file_name) {
+        if !subject_file_name.eq(borrowed_expected_file_name) {
             AssertionFailure::from_spec(self)
-                .with_expected(build_file_name_message(expected_file_name))
+                .with_expected(build_file_name_message(borrowed_expected_file_name))
                 .with_actual(format!("<{}>", subject_file_name))
                 .fail();
         }
@@ -175,6 +177,14 @@ mod tests {
     #[should_panic]
     pub fn should_panic_if_path_does_not_represent_a_file() {
         assert_that(&Path::new(&MANIFEST_PATH)).is_a_file();
+    }
+
+    #[test]
+    pub fn has_file_name_should_allow_multiple_borrow_forms() {
+        let path = MANIFEST_PATH.to_string() + "/Cargo.toml";
+        assert_that(&Path::new(&path)).has_file_name("Cargo.toml");
+        assert_that(&Path::new(&path)).has_file_name(&mut "Cargo.toml");
+        assert_that(&Path::new(&path)).has_file_name(&"Cargo.toml");
     }
 
     #[test]
