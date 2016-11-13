@@ -1,5 +1,6 @@
 use super::{AssertionFailure, Spec};
 
+use std::borrow::Borrow;
 use std::cmp::PartialEq;
 use std::fmt::Debug;
 
@@ -8,10 +9,10 @@ macro_rules! generate_iter_spec_trait {
         pub trait $trait_name<'s, T: 's>
             where T: Debug + PartialEq
             {
-                fn contains(&mut self, expected_value: &'s T);
+                fn contains<E: 's + Borrow<T>>(&mut self, expected_value: E);
                 fn contains_all_of<E: 's>(&mut self, expected_values_iter: &'s E)
                     where E: IntoIterator<Item = &'s T> + Clone;
-                fn does_not_contain(&mut self, expected_value: &'s T);
+                fn does_not_contain<E: 's + Borrow<T>>(&mut self, expected_value: E);
                 fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E)
                     where E: Iterator<Item = &'s T> + Clone;
             }
@@ -41,9 +42,9 @@ impl<'s, T: 's, I> ContainingIntoIterAssertions<'s, T> for Spec<'s, I>
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec).contains(&2);
     /// ```
-    fn contains(&mut self, expected_value: &'s T) {
+    fn contains<E: 's + Borrow<T>>(&mut self, expected_value: E) {
         let subject_iter = self.subject.into_iter();
-        check_iterator_contains(self, subject_iter, &expected_value, true);
+        check_iterator_contains(self, subject_iter, expected_value, true);
     }
 
     /// Asserts that the subject contains all of the provided values. The subject must implement
@@ -68,9 +69,9 @@ impl<'s, T: 's, I> ContainingIntoIterAssertions<'s, T> for Spec<'s, I>
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec).does_not_contain(&4);
     /// ```
-    fn does_not_contain(&mut self, expected_value: &'s T) {
+    fn does_not_contain<E: 's + Borrow<T>>(&mut self, expected_value: E) {
         let subject_iter = self.subject.into_iter();
-        check_iterator_contains(self, subject_iter, &expected_value, false);
+        check_iterator_contains(self, subject_iter, expected_value, false);
     }
 
     /// Asserts that the subject is equal to provided iterator. The subject must implement
@@ -100,9 +101,9 @@ impl<'s, T: 's, I> ContainingIteratorAssertions<'s, T> for Spec<'s, I>
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec.iter()).contains(&2);
     /// ```
-    fn contains(&mut self, expected_value: &'s T) {
+    fn contains<E: 's + Borrow<T>>(&mut self, expected_value: E) {
         let subject_iter = self.subject.clone();
-        check_iterator_contains(self, subject_iter, &expected_value, true);
+        check_iterator_contains(self, subject_iter, expected_value, true);
     }
 
     /// Asserts that the subject contains all of the provided values. The subject must implement
@@ -127,9 +128,9 @@ impl<'s, T: 's, I> ContainingIteratorAssertions<'s, T> for Spec<'s, I>
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec.iter()).does_not_contain(&4);
     /// ```
-    fn does_not_contain(&mut self, expected_value: &'s T) {
+    fn does_not_contain<E: 's + Borrow<T>>(&mut self, expected_value: E) {
         let subject_iter = self.subject.clone();
-        check_iterator_contains(self, subject_iter, &expected_value, false);
+        check_iterator_contains(self, subject_iter, expected_value, false);
     }
 
     /// Asserts that the iterable subject is equal to provided iterator. The subject must implement
@@ -216,18 +217,20 @@ impl<'s, T: 's, I> MappingIterAssertions<'s, T> for Spec<'s, I>
     }
 }
 
-fn check_iterator_contains<T, V, I>(spec: &mut Spec<T>,
-                                    actual_iter: I,
-                                    expected_value: &V,
-                                    should_contain: bool)
+fn check_iterator_contains<'s, T, V: 's, I, E: Borrow<V>>(spec: &mut Spec<T>,
+                                                          actual_iter: I,
+                                                          expected_value: E,
+                                                          should_contain: bool)
     where V: PartialEq + Debug,
-          I: Iterator<Item = V>
+          I: Iterator<Item = &'s V>
 {
+    let borrowed_expected_value = expected_value.borrow();
+
     let mut contains_value = false;
     let mut actual = Vec::new();
 
     for x in actual_iter {
-        if expected_value.eq(&x) {
+        if borrowed_expected_value.eq(&x) {
             contains_value = true;
         }
 
@@ -235,7 +238,7 @@ fn check_iterator_contains<T, V, I>(spec: &mut Spec<T>,
     }
 
     if contains_value != should_contain {
-        panic_unmatched(spec, expected_value, actual, should_contain);
+        panic_unmatched(spec, borrowed_expected_value, actual, should_contain);
     }
 }
 
@@ -361,6 +364,14 @@ mod tests {
     use std::collections::LinkedList;
 
     #[test]
+    fn contains_should_allow_for_multiple_borrow_types_for_intoiter() {
+        let test_vec = vec![1, 2, 3];
+        assert_that(&test_vec).contains(2);
+        assert_that(&test_vec).contains(&mut 2);
+        assert_that(&test_vec).contains(&2);
+    }
+
+    #[test]
     fn should_not_panic_if_vec_contains_value() {
         let test_vec = vec![1, 2, 3];
         assert_that(&test_vec).contains(&2);
@@ -467,6 +478,14 @@ mod tests {
         let test_vec = vec![1, 2, 3];
 
         assert_that(&test_vec).equals_iterator(&expected_vec.iter());
+    }
+
+    #[test]
+    fn contains_should_allow_for_multiple_borrow_types_for_iterators() {
+        let test_vec = vec![1, 2, 3];
+        assert_that(&test_vec.iter()).contains(2);
+        assert_that(&test_vec.iter()).contains(&mut 2);
+        assert_that(&test_vec.iter()).contains(&2);
     }
 
     #[test]

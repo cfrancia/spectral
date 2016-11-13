@@ -14,10 +14,8 @@ pub trait ContainingResultAssertions<T, E>
     where T: Debug,
           E: Debug
 {
-    fn is_ok_containing(&mut self, expected_value: &T)
-        where T: PartialEq;
-    fn is_err_containing(&mut self, expected_value: &E)
-        where E: PartialEq;
+    fn is_ok_containing(&mut self, expected_value: &T) where T: PartialEq;
+    fn is_err_containing(&mut self, expected_value: &E) where E: PartialEq;
 }
 
 impl<'s, T, E> ContainingResultAssertions<T, E> for Spec<'s, Result<T, E>>
