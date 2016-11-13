@@ -146,7 +146,7 @@ Note: Descriptions and examples for each of the assertions are further down in t
 
 ### Results
 #### is_ok -> (returns a new Spec with the Ok value)
-#### is_error -> (returns a new Spec with the Err value)
+#### is_err -> (returns a new Spec with the Err value)
 #### is_ok_containing
 #### is_err_containing
 
