@@ -554,7 +554,7 @@ assert_that(&Result::Err::<usize, usize>(1)).is_err_containing(&1);
 ### Strings
 #### starts_with
 
-Asserts that the subject `&str` starts with the provided `&str`.
+Asserts that the subject `&str` or `String` starts with the provided `&str`.
 
 ##### Example
 ```rust
@@ -569,7 +569,7 @@ assert_that(&"Hello").starts_with(&"H");
 
 #### ends_with
 
-Asserts that the subject `&str` ends with the provided `&str`.
+Asserts that the subject `&str` or `String` ends with the provided `&str`.
 
 ##### Example
 ```rust
@@ -584,7 +584,7 @@ assert_that(&"Hello").ends_with(&"o");
 
 #### contains
 
-Asserts that the subject `&str` contains the provided `&str`.
+Asserts that the subject `&str` or `String` contains the provided `&str`.
 
 ##### Example
 ```rust
