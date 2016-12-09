@@ -187,14 +187,14 @@ macro_rules! assert_that {
             assert_that(&$subject).at_location(format!("{}:{}", file, line))
         }
     };
-    (&$subject:ident$(.$additional_subject:ident)*) => {
-        assert_that!($subject$(.$additional_subject)*)
+    (&$subject:expr) => {
+        assert_that!($subject)
     };
-    ($subject:ident$(.$additional_subject:ident)*) => {
+    ($subject:expr) => {
         {
             let line = line!();
             let file =  file!();
-            assert_that(&$subject$(.$additional_subject)*).at_location(format!("{}:{}", file, line))
+            assert_that(&$subject).at_location(format!("{}:{}", file, line))
         }
     };
 }
@@ -510,6 +510,24 @@ mod tests {
         let test_vec = vec![1, 2, 3, 4, 5];
 
         assert_that!(test_vec).mapped_contains(|val| val * 2, &6);
+    }
+
+    #[test]
+    fn should_be_able_to_use_function_call_with_macro() {
+        struct Line {
+            x0: i32,
+            x1: i32,
+        }
+
+        impl Line {
+            fn get_delta_x(&self) -> i32 {
+                return (self.x1 - self.x0).abs();
+            }
+        }
+
+        let line = Line { x0: 1, x1: 3 };
+        assert_that!(line.get_delta_x()).is_equal_to(2);
+        assert_that!(&line.get_delta_x()).is_equal_to(2);
     }
 
     #[test]
