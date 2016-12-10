@@ -143,19 +143,25 @@ fn is_a_directory<'s, S: DescriptiveSpec<'s>>(subject: &Path, spec: &'s S) {
 }
 
 
-fn has_file_name<'s, S: DescriptiveSpec<'s>>(subject: &Path, expected_file_name: &str, spec: &'s S) {
+fn has_file_name<'s, S: DescriptiveSpec<'s>>(subject: &Path,
+                                             expected_file_name: &str,
+                                             spec: &'s S) {
     let subject_file_name = match subject.file_name() {
         Some(os_string) => {
             match os_string.to_str() {
                 Some(val) => val,
                 None => {
-                    fail_from_file_name(spec, expected_file_name, format!("an invalid UTF-8 file name"));
+                    fail_from_file_name(spec,
+                                        expected_file_name,
+                                        format!("an invalid UTF-8 file name"));
                     unreachable!();
                 }
             }
         }
         None => {
-            fail_from_file_name(spec, expected_file_name, format!("a non-resolvable path <{:?}>", subject));
+            fail_from_file_name(spec,
+                                expected_file_name,
+                                format!("a non-resolvable path <{:?}>", subject));
             unreachable!();
         }
     };
@@ -166,10 +172,10 @@ fn has_file_name<'s, S: DescriptiveSpec<'s>>(subject: &Path, expected_file_name:
 }
 
 fn fail_from_file_name<'s, S: DescriptiveSpec<'s>>(spec: &'s S, expected: &str, actual: String) {
-        AssertionFailure::from_spec(spec)
-            .with_expected(build_file_name_message(expected))
-            .with_actual(actual)
-            .fail();
+    AssertionFailure::from_spec(spec)
+        .with_expected(build_file_name_message(expected))
+        .with_actual(actual)
+        .fail();
 }
 
 fn build_file_name_message(file_name: &str) -> String {

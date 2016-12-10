@@ -72,7 +72,9 @@ impl<'s> StrAssertions for Spec<'s, String> {
     }
 }
 
-fn starts_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S, subject: &str, expected: E) {
+fn starts_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S,
+                                                                   subject: &str,
+                                                                   expected: E) {
     let borrowed_expected = expected.borrow();
 
     if !subject.starts_with(borrowed_expected) {
@@ -83,7 +85,9 @@ fn starts_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S, 
     }
 }
 
-fn ends_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S, subject: &str, expected: E) {
+fn ends_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S,
+                                                                 subject: &str,
+                                                                 expected: E) {
     let borrowed_expected = expected.borrow();
 
     if !subject.ends_with(borrowed_expected) {
@@ -94,7 +98,9 @@ fn ends_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S, su
     }
 }
 
-fn contains<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S, subject: &str, expected: E) {
+fn contains<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S,
+                                                                subject: &str,
+                                                                expected: E) {
     let borrowed_expected = expected.borrow();
 
     if !subject.contains(borrowed_expected) {
