@@ -9,9 +9,6 @@ pub trait ResultAssertions<'s, T, E>
 {
     fn is_ok(&mut self) -> Spec<'s, T>;
     fn is_err(&mut self) -> Spec<'s, E>;
-
-    #[deprecated(since="0.5.1", note="Please use `is_err` instead as a direct replacement")]
-    fn is_error(&mut self) -> Spec<'s, E>;
 }
 
 pub trait ContainingResultAssertions<T, E>
@@ -148,19 +145,6 @@ impl<'s, T, E> ResultAssertions<'s, T, E> for Spec<'s, Result<T, E>>
             }
         }
     }
-
-    /// DEPRECATED: Use `is_err` instead to match standard Rust naming conventions.
-    ///
-    /// Asserts that the subject is `Err`. The value type must be a `Result`.
-    ///
-    /// This will return a new `Spec` containing the unwrapped value if it is `Err`.
-    ///
-    /// ```rust,ignore
-    /// assert_that(&Result::Err::<usize, usize>(1)).is_error();
-    /// ```
-    fn is_error(&mut self) -> Spec<'s, E> {
-        self.is_err()
-    }
 }
 
 #[cfg(test)]
@@ -185,12 +169,6 @@ mod tests {
     fn should_return_unwrapped_value_if_subject_is_ok() {
         let result: Result<&str, &str> = Ok("Hello");
         assert_that(&result).is_ok().is_equal_to(&"Hello");
-    }
-
-    #[test]
-    fn should_still_support_deprecated_is_error() {
-        let result: Result<&str, &str> = Err("Oh no");
-        assert_that(&result).is_error();
     }
 
     #[test]
