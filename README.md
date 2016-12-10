@@ -397,7 +397,7 @@ assert_that(&Some(1)).contains_value(&1);
 ### Paths
 #### exists
 
-Asserts that the subject `Path` refers to an existing location.
+Asserts that the subject `Path` or `PathBuf` refers to an existing location.
 
 ##### Example
 ```rust
@@ -412,7 +412,7 @@ assert_that(&Path::new("/tmp/file")).exists();
 
 #### does_not_exist
 
-Asserts that the subject `Path` does not refer to an existing location.
+Asserts that the subject `Path` or `PathBuf` does not refer to an existing location.
 
 ##### Example
 ```rust
@@ -427,7 +427,7 @@ assert_that(&Path::new("/tmp/file")).does_not_exist();
 
 #### is_a_file
 
-Asserts that the subject `Path` refers to an existing file.
+Asserts that the subject `Path` or `PathBuf` refers to an existing file.
 
 ##### Example
 ```rust
@@ -442,7 +442,7 @@ assert_that(&Path::new("/tmp/file")).is_a_file();
 
 #### is_a_directory
 
-Asserts that the subject `Path` refers to an existing directory.
+Asserts that the subject `Path` or `PathBuf` refers to an existing directory.
 
 ##### Example
 ```rust
@@ -457,7 +457,7 @@ assert_that(&Path::new("/tmp/dir/")).is_a_directory();
 
 #### has_file_name
 
-Asserts that the subject `Path` has the expected file name.
+Asserts that the subject `Path` or `PathBuf` has the expected file name.
 
 ##### Example
 ```rust
