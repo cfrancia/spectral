@@ -154,6 +154,7 @@ Note: Descriptions and examples for each of the assertions are further down in t
 #### starts_with
 #### ends_with
 #### contains
+#### is_empty
 
 ### Vectors
 #### has_length
@@ -597,6 +598,20 @@ assert_that(&"Hello").contains(&"e");
 	 but was: <"Hello">
 ```
 
+#### is_empty
+
+Asserts that the subject `&str` or `String` represents an empty string.
+
+##### Example
+```rust
+assert_that(&"").is_empty();
+```
+
+##### Failure Message
+```bash
+	expected: an empty string
+	 but was: <"Hello">
+```
 
 ### Vectors
 #### has_length

@@ -6,6 +6,7 @@ pub trait StrAssertions {
     fn starts_with<'r, E: Borrow<&'r str>>(&mut self, expected: E);
     fn ends_with<'r, E: Borrow<&'r str>>(&mut self, expected: E);
     fn contains<'r, E: Borrow<&'r str>>(&mut self, expected: E);
+    fn is_empty(&mut self);
 }
 
 impl<'s> StrAssertions for Spec<'s, &'s str> {
@@ -38,6 +39,16 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
         let subject = self.subject;
         contains(self, subject, expected);
     }
+
+    /// Asserts that the subject `&str` is empty.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&"").is_empty();
+    /// ```
+    fn is_empty(&mut self) {
+        let subject = self.subject;
+        is_empty(self, subject);
+    }
 }
 
 impl<'s> StrAssertions for Spec<'s, String> {
@@ -69,6 +80,16 @@ impl<'s> StrAssertions for Spec<'s, String> {
     fn contains<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
         let subject = &self.subject;
         contains(self, subject, expected);
+    }
+
+    /// Asserts that the subject `String` is empty.
+    ///
+    /// ```rust,ignore
+    /// assert_that(&"".to_owned()).is_empty();
+    /// ```
+    fn is_empty(&mut self) {
+        let subject = &self.subject;
+        is_empty(self, subject);
     }
 }
 
@@ -106,6 +127,15 @@ fn contains<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S,
     if !subject.contains(borrowed_expected) {
         AssertionFailure::from_spec(spec)
             .with_expected(format!("string containing <{:?}>", borrowed_expected))
+            .with_actual(format!("<{:?}>", subject))
+            .fail();
+    }
+}
+
+fn is_empty<'s, S: DescriptiveSpec<'s>>(spec: &'s S, subject: &str) {
+    if !subject.is_empty() {
+        AssertionFailure::from_spec(spec)
+            .with_expected(format!("an empty string"))
             .with_actual(format!("<{:?}>", subject))
             .fail();
     }
@@ -173,6 +203,19 @@ mod tests {
     }
 
     #[test]
+    fn should_not_panic_if_str_is_empty() {
+        let value = "";
+        assert_that(&value).is_empty();
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: an empty string\n\t but was: <\"Hello\">")]
+    fn should_panic_if_str_is_not_empty() {
+        let value = "Hello";
+        assert_that(&value).is_empty();
+    }
+
+    #[test]
     fn should_allow_multiple_borrow_forms_for_string() {
         let value = "Hello".to_owned();
         assert_that(&value).starts_with("H");
@@ -226,6 +269,19 @@ mod tests {
     fn should_panic_if_string_does_not_contain_value() {
         let value = "Hello".to_owned();
         assert_that(&value).contains(&"A");
+    }
+
+    #[test]
+    fn should_not_panic_if_string_is_empty() {
+        let value = "".to_owned();
+        assert_that(&value).is_empty();
+    }
+
+    #[test]
+    #[should_panic(expected = "\n\texpected: an empty string\n\t but was: <\"Hello\">")]
+    fn should_panic_if_string_is_not_empty() {
+        let value = "Hello".to_owned();
+        assert_that(&value).is_empty();
     }
 
 }
