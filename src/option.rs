@@ -123,6 +123,11 @@ mod tests {
     }
 
     #[test]
+    fn should_be_able_to_unwrap_referenced_vec() {
+        assert_that(&Some(&vec![1,2,3])).is_some().has_length(3);
+    }
+
+    #[test]
     fn contains_value_should_allow_multiple_borrow_types() {
         let option = Some("Hello");
         assert_that(&option).contains_value("Hello");
