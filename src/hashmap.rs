@@ -5,11 +5,17 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
 
-pub trait HashMapAssertions<'s, K: Hash + Eq, V: PartialEq> {
+pub trait HashMapAssertions<'s> {
     fn has_length(&mut self, expected: usize);
     fn is_empty(&mut self);
+}
+
+pub trait KeyHashMapAssertions<'s, K: Hash + Eq, V> {
     fn contains_key<E: Borrow<K>>(&mut self, expected_key: E) -> Spec<'s, V>;
     fn does_not_contain_key<E: Borrow<K>>(&mut self, expected_key: E);
+}
+
+pub trait EntryHashMapAssertions<'s, K: Hash + Eq, V: PartialEq> {
     fn contains_entry<E: Borrow<K>, F: Borrow<V>>(&mut self, expected_key: E, expected_value: F);
     fn does_not_contain_entry<E: Borrow<K>, F: Borrow<V>>(
         &mut self,
@@ -18,10 +24,10 @@ pub trait HashMapAssertions<'s, K: Hash + Eq, V: PartialEq> {
     );
 }
 
-impl<'s, K, V> HashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
+impl<'s, K, V> HashMapAssertions<'s> for Spec<'s, HashMap<K, V>>
 where
     K: Hash + Eq + Debug,
-    V: PartialEq + Debug,
+    V: Debug,
 {
     /// Asserts that the length of the subject hashmap is equal to the provided length. The subject
     /// type must be of `HashMap`.
@@ -64,7 +70,13 @@ where
                 .fail();
         }
     }
+}
 
+impl<'s, K, V> KeyHashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
+where
+    K: Hash + Eq + Debug,
+    V: Debug,
+{
     /// Asserts that the subject hashmap contains the expected key. The subject type must be
     /// of `HashMap`.
     ///
@@ -129,7 +141,13 @@ where
                 .fail();
         }
     }
+}
 
+impl<'s, K, V> EntryHashMapAssertions<'s, K, V> for Spec<'s, HashMap<K, V>>
+where
+    K: Hash + Eq + Debug,
+    V: PartialEq + Debug,
+{
     /// Asserts that the subject hashmap contains the expected key with the expected value.
     /// The subject type must be of `HashMap`.
     ///
@@ -223,6 +241,17 @@ mod tests {
         let mut test_map = HashMap::new();
         test_map.insert(1, 1);
         test_map.insert(2, 2);
+
+        assert_that(&test_map).has_length(2);
+    }
+
+    #[test]
+    fn should_not_panic_if_hashmap_length_matches_expected_and_value_is_not_partialeq() {
+        #[derive(Debug)]
+        struct NoPartialEq;
+        let mut test_map = HashMap::new();
+        test_map.insert(1, NoPartialEq);
+        test_map.insert(2, NoPartialEq);
 
         assert_that(&test_map).has_length(2);
     }

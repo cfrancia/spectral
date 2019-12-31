@@ -1,5 +1,5 @@
 pub use super::boolean::BooleanAssertions;
-pub use super::hashmap::HashMapAssertions;
+pub use super::hashmap::{EntryHashMapAssertions, HashMapAssertions, KeyHashMapAssertions};
 pub use super::iter::{
     ContainingIntoIterAssertions, ContainingIteratorAssertions, MappingIterAssertions,
 };
