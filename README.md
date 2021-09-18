@@ -596,6 +596,15 @@ Asserts that the subject `&str` or `String` contains the provided `&str`.
 assert_that(&"Hello").contains(&"e");
 ```
 
+#### does_not_contain
+
+Asserts that the subject `&str` or `String` does not contain the provided `&str`.
+
+##### Example
+```rust
+assert_that(&"Hello").does_not_contain(&"Bonjour");
+```
+
 ##### Failure Message
 ```bash
 	expected: string containing <"A">
