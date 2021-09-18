@@ -27,7 +27,7 @@ where
     /// type must be of `HashMap`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// # use std::collections::HashMap;
     /// let mut test_map = HashMap::new();
     /// test_map.insert(1, 1);
@@ -49,7 +49,7 @@ where
     /// Asserts that the subject hashmap is empty. The subject type must be of `HashMap`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// # use std::collections::HashMap;
     /// let test_map: HashMap<u8, u8> = HashMap::new();
     /// assert_that(&test_map).is_empty();
@@ -71,7 +71,7 @@ where
     /// This will return a new `Spec` containing the associated value if the key is present.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// # use std::collections::HashMap;
     /// let mut test_map = HashMap::new();
     /// test_map.insert("hello", "hi");
@@ -108,7 +108,7 @@ where
     /// of `HashMap`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// # use std::collections::HashMap;
     /// let mut test_map = HashMap::new();
     /// test_map.insert("hello", "hi");
@@ -134,7 +134,7 @@ where
     /// The subject type must be of `HashMap`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// # use std::collections::HashMap;
     /// let mut test_map = HashMap::new();
     /// test_map.insert("hello", "hi");
@@ -179,7 +179,7 @@ where
     /// The subject type must be of `HashMap`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// # use std::collections::HashMap;
     /// let mut test_map = HashMap::new();
     /// test_map.insert("hello", "hi");

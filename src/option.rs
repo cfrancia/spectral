@@ -27,7 +27,7 @@ where
     /// be an `Option`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&Some(1)).contains_value(&1);
     /// ```
     fn contains_value<E: Borrow<T>>(&mut self, expected_value: E) {
@@ -61,7 +61,7 @@ where
     /// This will return a new `Spec` containing the unwrapped value if it is `Some`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&Some(1)).is_some();
     /// ```
     fn is_some(&mut self) -> Spec<'s, T> {
@@ -86,7 +86,7 @@ where
     /// Asserts that the subject is `None`. The value type must be an `Option`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&Option::None::<String>).is_none();
     /// ```
     fn is_none(&mut self) {

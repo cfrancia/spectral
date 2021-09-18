@@ -25,7 +25,7 @@ where
     /// implement `PartialOrd`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&1).is_less_than(&2);
     /// ```
     fn is_less_than<E: Borrow<T>>(&mut self, other: E) {
@@ -44,7 +44,7 @@ where
     /// must implement `PartialOrd`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&2).is_less_than_or_equal_to(&2);
     /// ```
     fn is_less_than_or_equal_to<E: Borrow<T>>(&mut self, other: E) {
@@ -66,7 +66,7 @@ where
     /// implement `PartialOrd`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&2).is_greater_than(&1);
     /// ```
     fn is_greater_than<E: Borrow<T>>(&mut self, other: E) {
@@ -85,7 +85,7 @@ where
     /// must implement `PartialOrd`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&2).is_greater_than_or_equal_to(&1);
     /// ```
     fn is_greater_than_or_equal_to<E: Borrow<T>>(&mut self, other: E) {
@@ -115,7 +115,7 @@ impl<'s, T: Float + Debug> FloatAssertions<T> for Spec<'s, T> {
     /// The subject type must implement `Float` and `Debug`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&2.0f64).is_close_to(2.0f64, 0.01f64);
     /// ```
     fn is_close_to<E: Borrow<T>, O: Borrow<T>>(&mut self, expected: E, tolerance: O) {

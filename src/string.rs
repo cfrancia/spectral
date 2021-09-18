@@ -14,7 +14,7 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// Asserts that the subject `&str` starts with the provided `&str`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"Hello").starts_with(&"H");
     /// ```
     fn starts_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -25,7 +25,7 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// Asserts that the subject `&str` ends with the provided `&str`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"Hello").ends_with(&"o");
     /// ```
     fn ends_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -36,7 +36,7 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// Asserts that the subject `&str` contains the provided `&str`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"Hello").contains(&"e");
     /// ```
     fn contains<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -47,7 +47,7 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// Asserts that the subject `&str` contains the provided `&str`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"Hello").contains(&"e");
     /// ```
     fn does_not_contain<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -58,7 +58,7 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// Asserts that the subject `&str` is empty.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"").is_empty();
     /// ```
     fn is_empty(&mut self) {
@@ -71,7 +71,7 @@ impl<'s> StrAssertions for Spec<'s, String> {
     /// Asserts that the subject `String` starts with the provided `&str`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"Hello".to_owned()).starts_with(&"H");
     /// ```
     fn starts_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -82,7 +82,7 @@ impl<'s> StrAssertions for Spec<'s, String> {
     /// Asserts that the subject `String` ends with the provided `&str`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"Hello".to_owned()).ends_with(&"o");
     /// ```
     fn ends_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -93,7 +93,7 @@ impl<'s> StrAssertions for Spec<'s, String> {
     /// Asserts that the subject `String` contains the provided `&str`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"Hello".to_owned()).contains(&"e");
     /// ```
     fn contains<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -104,7 +104,7 @@ impl<'s> StrAssertions for Spec<'s, String> {
     /// Asserts that the subject `String` does not contain the provided `&str`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"Hello".to_owned()).does_not_contain(&"x");
     /// ```
     fn does_not_contain<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -115,7 +115,7 @@ impl<'s> StrAssertions for Spec<'s, String> {
     /// Asserts that the subject `String` is empty.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"".to_owned()).is_empty();
     /// ```
     fn is_empty(&mut self) {

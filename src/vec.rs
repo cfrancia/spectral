@@ -10,7 +10,7 @@ impl<'s, T> VecAssertions for Spec<'s, Vec<T>> {
     /// type must be of `Vec`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&vec![1, 2, 3, 4]).has_length(4);
     /// ```
     fn has_length(&mut self, expected: usize) {
@@ -26,7 +26,7 @@ impl<'s, T> VecAssertions for Spec<'s, Vec<T>> {
     /// Asserts that the subject vector is empty. The subject type must be of `Vec`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// let test_vec: Vec<u8> = vec![];
     /// assert_that(&test_vec).is_empty();
     /// ```

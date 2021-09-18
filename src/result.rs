@@ -34,7 +34,7 @@ where
     /// The subject type must be a `Result`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&Result::Ok::<usize, usize>(1)).is_ok_containing(&1);
     /// ```
     fn is_ok_containing<V: Borrow<T>>(&mut self, expected_value: V)
@@ -65,7 +65,7 @@ where
     /// The subject type must be a `Result`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&Result::Err::<usize, usize>(1)).is_err_containing(&1);
     /// ```
     fn is_err_containing<V: Borrow<E>>(&mut self, expected_value: V)
@@ -107,7 +107,7 @@ where
     /// This will return a new `Spec` containing the unwrapped value if it is `Ok`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&Result::Ok::<usize, usize>(1)).is_ok();
     /// ```
     fn is_ok(&mut self) -> Spec<'s, T> {
@@ -134,7 +134,7 @@ where
     /// This will return a new `Spec` containing the unwrapped value if it is `Err`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&Result::Err::<usize, usize>(1)).is_err();
     /// ```
     fn is_err(&mut self) -> Spec<'s, E> {

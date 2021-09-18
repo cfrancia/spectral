@@ -47,7 +47,7 @@ where
     /// `IntoIterator`, and the contained type must implement `PartialEq` and `Debug`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec).contains(&2);
     /// ```
@@ -60,7 +60,7 @@ where
     /// `IntoIterator`, and the contained type must implement `PartialEq` and `Debug`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec).contains_all_of(&vec![&2, &3]);
     /// ```
@@ -77,7 +77,7 @@ where
     /// `IntoIterator`, and the contained type must implement `PartialEq` and `Debug`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec).does_not_contain(&4);
     /// ```
@@ -91,7 +91,7 @@ where
     /// value must implement Iterator and Clone.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// let expected_vec = vec![1,2,3];
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec).equals_iterator(&expected_vec.iter());
@@ -113,7 +113,7 @@ where
     /// `Iterator`, and the contained type must implement `PartialEq` and `Debug`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// let test_vec = vec![1,2,3];
     /// assert_that(&test_vec.iter()).contains(&2);
     /// ```
@@ -127,7 +127,7 @@ where
     ///
     /// ```rust
     /// let test_vec = vec![1,2,3];
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&test_vec.iter()).contains_all_of(&vec![&2, &3]);
     /// ```
     fn contains_all_of<E: 's>(&mut self, expected_values_iter: &'s E)
@@ -144,7 +144,7 @@ where
     ///
     /// ```rust
     /// let test_vec = vec![1,2,3];
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&test_vec.iter()).does_not_contain(&4);
     /// ```
     fn does_not_contain<E: 's + Borrow<T>>(&mut self, expected_value: E) {
@@ -159,7 +159,7 @@ where
     /// ```rust
     /// let expected_vec = vec![1,2,3];
     /// let test_vec = vec![1,2,3];
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&test_vec.iter()).equals_iterator(&expected_vec.iter());
     /// ```
     fn equals_iterator<E: 's>(&mut self, expected_iter: &'s E)
@@ -189,7 +189,7 @@ where
     /// }
     ///
     /// //...
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&vec![Simple { val: 1 }, Simple { val: 2 } ]).mapped_contains(|x| x.val, &2);
     /// ```
     fn mapped_contains<F, M: 's>(&mut self, mapping_function: F, expected_value: &M)
@@ -212,7 +212,7 @@ where
     ///
     /// ```rust
     /// # use std::collections::LinkedList;
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// #[derive(Debug, PartialEq)]
     /// # pub enum TestEnum { Good, Bad }
     /// let mut test_into_iter = LinkedList::new();

@@ -9,7 +9,7 @@ impl<'s> BooleanAssertions for Spec<'s, bool> {
     /// Asserts that the subject is true. The subject type must be `bool`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&true).is_true();
     /// ```
     fn is_true(&mut self) {
@@ -24,7 +24,7 @@ impl<'s> BooleanAssertions for Spec<'s, bool> {
     /// Asserts that the subject is false. The subject type must be `bool`.
     ///
     /// ```rust, should_panic
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&true).is_false();
     /// ```
     fn is_false(&mut self) {

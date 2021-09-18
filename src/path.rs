@@ -24,7 +24,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
     /// Asserts that the subject `Path` does not refer to an existing location.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// # use std::path::Path;
     /// assert_that(&Path::new("/tmp/file")).does_not_exist();
     /// ```
@@ -53,7 +53,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
     /// Asserts that the subject `Path` has the expected file name.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// # use std::path::Path;
     /// assert_that(&Path::new("/tmp/file")).has_file_name(&"file");
     /// ```

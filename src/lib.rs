@@ -14,26 +14,26 @@
 //!
 //! ```toml
 //! [dependencies]
-//! spectral = "0.6.0"
+//! speculoos = "0.6.0"
 //! ```
 //!
 //! Then add this to your crate:
 //!
 //! ```rust
-//! extern crate spectral;
+//! extern crate speculoos;
 //! ```
 //!
 //! If you want macro support, include `#[macro_use]` to the declaration:
 //!
 //! ```rust, ignore
 //! #[macro_use]
-//! extern crate spectral;
+//! extern crate speculoos;
 //! ```
 //!
 //! To quickly start using assertions, `use` the prelude module:
 //!
 //! ```rust
-//! use spectral::prelude::*;
+//! use speculoos::prelude::*;
 //! ```
 //!
 //! ## Example
@@ -78,7 +78,7 @@
 //! reference.
 //!
 //! ```rust
-//! # use spectral::prelude::*;
+//! # use speculoos::prelude::*;
 //! #[test]
 //! pub fn should_be_the_correct_string() {
 //!     let subject = "Hello World!";
@@ -97,7 +97,7 @@
 //! to start with. We'll check to see that it starts with the letter 'H'.
 //!
 //! ```rust
-//! # use spectral::prelude::*;
+//! # use speculoos::prelude::*;
 //! #[test]
 //! pub fn should_be_the_correct_string() {
 //!     let subject = "Hello World!";
@@ -113,7 +113,7 @@
 //! to be "ello World!".
 //!
 //! ```rust
-//! # use spectral::prelude::*;
+//! # use speculoos::prelude::*;
 //! #[test]
 //! pub fn should_be_the_correct_string() {
 //!     let subject = "ello World!";
@@ -415,7 +415,7 @@ where
     /// implement `PartialEq`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"hello").is_equal_to(&"hello");
     /// ```
     pub fn is_equal_to<E: Borrow<S>>(&mut self, expected: E) {
@@ -434,7 +434,7 @@ where
     /// implement `PartialEq`.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"hello").is_not_equal_to(&"olleh");
     /// ```
     pub fn is_not_equal_to<E: Borrow<S>>(&mut self, expected: E) {
@@ -464,7 +464,7 @@ where
     /// you write your own assertion rather than relying upon this.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// assert_that(&"hello").matches(|x| x.eq(&"hello"));
     /// ```
     pub fn matches<F>(&mut self, matching_function: F)
@@ -483,7 +483,7 @@ where
     /// function.
     ///
     /// ```rust
-    /// # use spectral::prelude::*;
+    /// # use speculoos::prelude::*;
     /// # #[derive(Debug, PartialEq)]
     /// # struct TestStruct {
     /// #     pub value: u8,

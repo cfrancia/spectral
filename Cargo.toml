@@ -1,10 +1,13 @@
 [package]
-name = "spectral"
+name = "speculoos"
 version = "0.6.0"
-authors = ["cfrancia <cfrancia@users.noreply.github.com>"]
+authors = [
+    "cfrancia <cfrancia@users.noreply.github.com>",
+    "oknozor <paul.delafosse@protonmail.com>"
+]
 license = "Apache-2.0"
 description = "Fluent test assertions"
-repository = "https://github.com/cfrancia/spectral"
+repository = "https://github.com/cfrancia/speculoos"
 readme = "README.md"
 keywords = ["fluent", "testing", "matchers", "assert", "assertions"]
 

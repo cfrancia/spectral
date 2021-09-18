@@ -1,4 +1,8 @@
-# spectral
+This is a fork the unmaintained  crate [spectral](https://github.com/cfrancia/spectral). 
+Spectral as not changed for five years and yet is still very usable, the goal of this fork
+is to add new assertion capabilities without breaking the existing API.
+
+# speculoos
 Fluent test assertions for Rust.
 
 Influenced by Google Truth and other fluent assertion frameworks.
@@ -9,17 +13,17 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-spectral = "0.6.0"
+speculoos = "0.6.0"
 ```
 
 Then add this to your crate:
 ```rust
-extern crate spectral
+extern crate speculoos;
 ```
 
 To quickly start using assertions, simply use the `prelude` module in your test module:
 ```rust
-use spectral::prelude::*;
+use speculoos::prelude::*;
 ```
 
 ## Overview
@@ -108,7 +112,7 @@ This allows you to pass through a subject to test without needing to deliberatel
 assert_that!(&test_vec).has_length(5)
 ```
 
-Additionally, this will provide you with the file and line number of the failing assertion (rather than just the internal spectral panic location).
+Additionally, this will provide you with the file and line number of the failing assertion (rather than just the internal speculoos panic location).
 
 ## Assertions (Basic)
 
