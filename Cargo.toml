@@ -7,7 +7,7 @@ authors = [
 ]
 license = "Apache-2.0"
 description = "Fluent test assertions"
-repository = "https://github.com/cfrancia/speculoos"
+repository = "https://github.com/oknozor/speculoos"
 readme = "README.md"
 keywords = ["fluent", "testing", "matchers", "assert", "assertions"]
 

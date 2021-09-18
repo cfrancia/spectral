@@ -3,6 +3,8 @@ Spectral as not changed for five years and yet is still very usable, the goal of
 is to add new assertion capabilities without breaking the existing API.
 
 # speculoos
+[![CI](https://github.com/oknozor/speculoos/actions/workflows/CI.yml/badge.svg)](https://github.com/oknozor/speculoos/actions/workflows/CI.yml)
+
 Fluent test assertions for Rust.
 
 Influenced by Google Truth and other fluent assertion frameworks.
