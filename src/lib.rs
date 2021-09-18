@@ -163,16 +163,16 @@ pub mod vec;
 // significantly more annoying.
 #[cfg(not(test))]
 mod colours {
-    pub const TERM_RED: &'static str = "\x1B[31m";
-    pub const TERM_BOLD: &'static str = "\x1B[1m";
-    pub const TERM_RESET: &'static str = "\x1B[0m";
+    pub const TERM_RED: &str = "\x1B[31m";
+    pub const TERM_BOLD: &str = "\x1B[1m";
+    pub const TERM_RESET: &str = "\x1B[0m";
 }
 
 #[cfg(test)]
 mod colours {
-    pub const TERM_RED: &'static str = "";
-    pub const TERM_BOLD: &'static str = "";
-    pub const TERM_RESET: &'static str = "";
+    pub const TERM_RED: &str = "";
+    pub const TERM_BOLD: &str = "";
+    pub const TERM_RESET: &str = "";
 }
 
 #[cfg(feature = "num")]
@@ -278,7 +278,7 @@ impl<'r> SpecDescription<'r> {
     /// Creates a new assertion, passing through its description.
     pub fn that<S>(self, subject: &'r S) -> Spec<'r, S> {
         Spec {
-            subject: subject,
+            subject,
             subject_name: None,
             location: self.location,
             description: Some(self.value),
@@ -304,7 +304,7 @@ impl<'r, T: DescriptiveSpec<'r>> AssertionFailure<'r, T> {
     /// Construct a new AssertionFailure from a DescriptiveSpec.
     pub fn from_spec(spec: &'r T) -> AssertionFailure<'r, T> {
         AssertionFailure {
-            spec: spec,
+            spec,
             expected: None,
             actual: None,
         }
@@ -329,7 +329,7 @@ impl<'r, T: DescriptiveSpec<'r>> AssertionFailure<'r, T> {
     /// Builds the failure message with a description (if present), the expected value,
     /// and the actual value and then calls `panic` with the created message.
     pub fn fail(&mut self) {
-        if !self.expected.is_some() || !self.actual.is_some() {
+        if self.expected.is_none() || self.actual.is_none() {
             panic!("invalid assertion");
         }
 
@@ -447,7 +447,7 @@ where
                     "<{:?}> not equal to <{:?}>",
                     subject, borrowed_expected
                 ))
-                .with_actual(format!("equal"))
+                .with_actual("equal".to_string())
                 .fail();
         }
     }
@@ -532,7 +532,7 @@ mod tests {
 
         impl Line {
             fn get_delta_x(&self) -> i32 {
-                return (self.x1 - self.x0).abs();
+                (self.x1 - self.x0).abs()
             }
         }
 
@@ -544,14 +544,14 @@ mod tests {
     #[test]
     #[should_panic(expected = "\n\ttest condition:\n\texpected: <2>\n\t but was: <1>")]
     fn should_contain_assertion_description_in_panic() {
-        asserting(&"test condition").that(&1).is_equal_to(&2);
+        asserting("test condition").that(&1).is_equal_to(&2);
     }
 
     #[test]
     #[should_panic(expected = "\n\tclosure:\n\texpectation failed for value <\"Hello\">")]
     fn should_contain_assertion_description_if_message_is_provided() {
         let value = "Hello";
-        asserting(&"closure")
+        asserting("closure")
             .that(&value)
             .matches(|val| val.eq(&"Hi"));
     }
@@ -594,7 +594,7 @@ mod tests {
                    \n\n\tat location: src/lib.rs:"
     )]
     fn should_contain_subject_name_in_panic_for_assertions() {
-        assert_that!(&1).named(&"number one").is_equal_to(&2);
+        assert_that!(&1).named("number one").is_equal_to(&2);
     }
 
     #[test]
@@ -605,7 +605,7 @@ mod tests {
     fn should_contain_subject_name_in_panic_for_assertions_if_message_is_provided() {
         let value = "Hello";
         assert_that!(&value)
-            .named(&"a word")
+            .named("a word")
             .matches(|val| val.eq(&"Hi"));
     }
 

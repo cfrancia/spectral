@@ -15,8 +15,8 @@ impl<'s> BooleanAssertions for Spec<'s, bool> {
     fn is_true(&mut self) {
         if !*self.subject {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("bool to be <true>"))
-                .with_actual(format!("<false>"))
+                .with_expected("bool to be <true>".to_string())
+                .with_actual("<false>".to_string())
                 .fail();
         }
     }
@@ -30,8 +30,8 @@ impl<'s> BooleanAssertions for Spec<'s, bool> {
     fn is_false(&mut self) {
         if *self.subject {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("bool to be <false>"))
-                .with_actual(format!("<true>"))
+                .with_expected("bool to be <false>".to_string())
+                .with_actual("<true>".to_string())
                 .fail();
         }
     }

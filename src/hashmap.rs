@@ -59,7 +59,7 @@ where
 
         if !subject.is_empty() {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("an empty hashmap"))
+                .with_expected("an empty hashmap".to_string())
                 .with_actual(format!("a hashmap with length <{:?}>", subject.len()))
                 .fail();
         }
@@ -125,7 +125,7 @@ where
                     "hashmap to not contain key <{:?}>",
                     borrowed_expected_key
                 ))
-                .with_actual(format!("present in hashmap"))
+                .with_actual("present in hashmap".to_string())
                 .fail();
         }
     }
@@ -205,7 +205,7 @@ where
                     "hashmap to not contain key <{:?}> with value <{:?}>",
                     borrowed_expected_key, borrowed_expected_value
                 ))
-                .with_actual(format!("present in hashmap"))
+                .with_actual("present in hashmap".to_string())
                 .fail();
         }
     }

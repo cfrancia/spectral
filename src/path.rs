@@ -112,7 +112,7 @@ fn exists<'s, S: DescriptiveSpec<'s>>(subject: &Path, spec: &'s S) {
     if !subject.exists() {
         AssertionFailure::from_spec(spec)
             .with_expected(format!("Path of <{:?}> to exist", subject))
-            .with_actual(format!("a non-existent Path"))
+            .with_actual("a non-existent Path".to_string())
             .fail();
     }
 }
@@ -121,7 +121,7 @@ fn does_not_exist<'s, S: DescriptiveSpec<'s>>(subject: &Path, spec: &'s S) {
     if subject.exists() {
         AssertionFailure::from_spec(spec)
             .with_expected(format!("Path of <{:?}> to not exist", subject))
-            .with_actual(format!("a resolvable Path"))
+            .with_actual("a resolvable Path".to_string())
             .fail();
     }
 }
@@ -130,7 +130,7 @@ fn is_a_file<'s, S: DescriptiveSpec<'s>>(subject: &Path, spec: &'s S) {
     if !subject.is_file() {
         AssertionFailure::from_spec(spec)
             .with_expected(format!("Path of <{:?}> to be a file", subject))
-            .with_actual(format!("not a resolvable file"))
+            .with_actual("not a resolvable file".to_string())
             .fail();
     }
 }
@@ -139,7 +139,7 @@ fn is_a_directory<'s, S: DescriptiveSpec<'s>>(subject: &Path, spec: &'s S) {
     if !subject.is_dir() {
         AssertionFailure::from_spec(spec)
             .with_expected(format!("Path of <{:?}> to be a directory", subject))
-            .with_actual(format!("not a resolvable directory"))
+            .with_actual("not a resolvable directory".to_string())
             .fail();
     }
 }
@@ -156,7 +156,7 @@ fn has_file_name<'s, S: DescriptiveSpec<'s>>(
                 fail_from_file_name(
                     spec,
                     expected_file_name,
-                    format!("an invalid UTF-8 file name"),
+                    "an invalid UTF-8 file name".to_string(),
                 );
                 unreachable!();
             }
@@ -194,7 +194,7 @@ mod tests {
 
     use std::path::{Path, PathBuf};
 
-    static MANIFEST_PATH: &'static str = env!("CARGO_MANIFEST_DIR");
+    static MANIFEST_PATH: &str = env!("CARGO_MANIFEST_DIR");
 
     #[test]
     pub fn should_not_panic_if_path_exists() {

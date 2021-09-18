@@ -45,8 +45,8 @@ where
             None => {
                 AssertionFailure::from_spec(self)
                     .with_expected(format!("option<{:?}>", borrowed_expected_value))
-                    .with_actual(format!("option[none]"))
-                    .fail();
+                    .with_actual("option[none]".to_string())
+                                     .fail();
             }
         };
     }
@@ -74,8 +74,8 @@ where
             },
             None => {
                 AssertionFailure::from_spec(self)
-                    .with_expected(format!("option[some]"))
-                    .with_actual(format!("option[none]"))
+                    .with_expected("option[some]".to_string())
+                    .with_actual("option[none]".to_string())
                     .fail();
 
                 unreachable!();
@@ -94,7 +94,7 @@ where
             None => (),
             Some(ref val) => {
                 AssertionFailure::from_spec(self)
-                    .with_expected(format!("option[none]"))
+                    .with_expected("option[none]".to_string())
                     .with_actual(format!("option<{:?}>", val))
                     .fail();
             }

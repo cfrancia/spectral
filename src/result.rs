@@ -120,7 +120,7 @@ where
             },
             Err(ref err) => {
                 AssertionFailure::from_spec(self)
-                    .with_expected(format!("result[ok]"))
+                    .with_expected("result[ok]".to_string())
                     .with_actual(format!("result[error]<{:?}>", err))
                     .fail();
 
@@ -147,7 +147,7 @@ where
             },
             Ok(ref val) => {
                 AssertionFailure::from_spec(self)
-                    .with_expected(format!("result[error]"))
+                    .with_expected("result[error]".to_string())
                     .with_actual(format!("result[ok]<{:?}>", val))
                     .fail();
 

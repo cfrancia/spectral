@@ -261,7 +261,7 @@ fn check_iterator_contains<'s, T, V: 's, I, E: Borrow<V>>(
     let mut actual = Vec::new();
 
     for x in actual_iter {
-        if borrowed_expected_value.eq(&x) {
+        if borrowed_expected_value.eq(x) {
             contains_value = true;
         }
 

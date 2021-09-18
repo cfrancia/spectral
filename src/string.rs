@@ -187,7 +187,7 @@ fn does_not_contain<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(
 fn is_empty<'s, S: DescriptiveSpec<'s>>(spec: &'s S, subject: &str) {
     if !subject.is_empty() {
         AssertionFailure::from_spec(spec)
-            .with_expected(format!("an empty string"))
+            .with_expected("an empty string".to_string())
             .with_actual(format!("<{:?}>", subject))
             .fail();
     }
