@@ -8,7 +8,8 @@ pub trait BooleanAssertions {
 impl<'s> BooleanAssertions for Spec<'s, bool> {
     /// Asserts that the subject is true. The subject type must be `bool`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&true).is_true();
     /// ```
     fn is_true(&mut self) {
@@ -22,7 +23,8 @@ impl<'s> BooleanAssertions for Spec<'s, bool> {
 
     /// Asserts that the subject is false. The subject type must be `bool`.
     ///
-    /// ```rust,ignore
+    /// ```rust, should_panic
+    /// # use spectral::prelude::*;
     /// assert_that(&true).is_false();
     /// ```
     fn is_false(&mut self) {
@@ -61,5 +63,4 @@ mod tests {
     pub fn should_panic_if_value_is_expected_to_be_false_and_is_not() {
         assert_that(&true).is_false();
     }
-
 }

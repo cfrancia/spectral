@@ -214,7 +214,7 @@ assert_that(&"hello").is_not_equal_to(&"hello");
 
 ##### Failure Message
 ```bash
-	expected: <1> to not equal <1>
+	expected: <1> not equal to <1>
 	 but was: equal
 ```
 

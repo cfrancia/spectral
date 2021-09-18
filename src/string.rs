@@ -6,13 +6,15 @@ pub trait StrAssertions {
     fn starts_with<'r, E: Borrow<&'r str>>(&mut self, expected: E);
     fn ends_with<'r, E: Borrow<&'r str>>(&mut self, expected: E);
     fn contains<'r, E: Borrow<&'r str>>(&mut self, expected: E);
+    fn does_not_contain<'r, E: Borrow<&'r str>>(&mut self, expected: E);
     fn is_empty(&mut self);
 }
 
 impl<'s> StrAssertions for Spec<'s, &'s str> {
     /// Asserts that the subject `&str` starts with the provided `&str`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&"Hello").starts_with(&"H");
     /// ```
     fn starts_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -22,7 +24,8 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
 
     /// Asserts that the subject `&str` ends with the provided `&str`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&"Hello").ends_with(&"o");
     /// ```
     fn ends_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -32,7 +35,8 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
 
     /// Asserts that the subject `&str` contains the provided `&str`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&"Hello").contains(&"e");
     /// ```
     fn contains<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -40,9 +44,21 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
         contains(self, subject, expected);
     }
 
+    /// Asserts that the subject `&str` contains the provided `&str`.
+    ///
+    /// ```rust
+    /// # use spectral::prelude::*;
+    /// assert_that(&"Hello").contains(&"e");
+    /// ```
+    fn does_not_contain<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
+        let subject = self.subject;
+        does_not_contain(self, subject, expected);
+    }
+
     /// Asserts that the subject `&str` is empty.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&"").is_empty();
     /// ```
     fn is_empty(&mut self) {
@@ -54,7 +70,8 @@ impl<'s> StrAssertions for Spec<'s, &'s str> {
 impl<'s> StrAssertions for Spec<'s, String> {
     /// Asserts that the subject `String` starts with the provided `&str`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&"Hello".to_owned()).starts_with(&"H");
     /// ```
     fn starts_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -64,7 +81,8 @@ impl<'s> StrAssertions for Spec<'s, String> {
 
     /// Asserts that the subject `String` ends with the provided `&str`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&"Hello".to_owned()).ends_with(&"o");
     /// ```
     fn ends_with<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -74,7 +92,8 @@ impl<'s> StrAssertions for Spec<'s, String> {
 
     /// Asserts that the subject `String` contains the provided `&str`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&"Hello".to_owned()).contains(&"e");
     /// ```
     fn contains<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
@@ -82,9 +101,21 @@ impl<'s> StrAssertions for Spec<'s, String> {
         contains(self, subject, expected);
     }
 
+    /// Asserts that the subject `String` does not contain the provided `&str`.
+    ///
+    /// ```rust
+    /// # use spectral::prelude::*;
+    /// assert_that(&"Hello".to_owned()).does_not_contain(&"x");
+    /// ```
+    fn does_not_contain<'r, E: Borrow<&'r str>>(&mut self, expected: E) {
+        let subject = &self.subject;
+        does_not_contain(self, subject, expected);
+    }
+
     /// Asserts that the subject `String` is empty.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&"".to_owned()).is_empty();
     /// ```
     fn is_empty(&mut self) {
@@ -93,9 +124,11 @@ impl<'s> StrAssertions for Spec<'s, String> {
     }
 }
 
-fn starts_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S,
-                                                                   subject: &str,
-                                                                   expected: E) {
+fn starts_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(
+    spec: &'s S,
+    subject: &str,
+    expected: E,
+) {
     let borrowed_expected = expected.borrow();
 
     if !subject.starts_with(borrowed_expected) {
@@ -106,9 +139,11 @@ fn starts_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S,
     }
 }
 
-fn ends_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S,
-                                                                 subject: &str,
-                                                                 expected: E) {
+fn ends_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(
+    spec: &'s S,
+    subject: &str,
+    expected: E,
+) {
     let borrowed_expected = expected.borrow();
 
     if !subject.ends_with(borrowed_expected) {
@@ -119,14 +154,31 @@ fn ends_with<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S,
     }
 }
 
-fn contains<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(spec: &'s S,
-                                                                subject: &str,
-                                                                expected: E) {
+fn contains<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(
+    spec: &'s S,
+    subject: &str,
+    expected: E,
+) {
     let borrowed_expected = expected.borrow();
 
     if !subject.contains(borrowed_expected) {
         AssertionFailure::from_spec(spec)
             .with_expected(format!("string containing <{:?}>", borrowed_expected))
+            .with_actual(format!("<{:?}>", subject))
+            .fail();
+    }
+}
+
+fn does_not_contain<'r, 's, S: DescriptiveSpec<'s>, E: Borrow<&'r str>>(
+    spec: &'s S,
+    subject: &str,
+    expected: E,
+) {
+    let borrowed_expected = expected.borrow();
+
+    if subject.contains(borrowed_expected) {
+        AssertionFailure::from_spec(spec)
+            .with_expected(format!("string not containing <{:?}>", borrowed_expected))
             .with_actual(format!("<{:?}>", subject))
             .fail();
     }
@@ -193,6 +245,21 @@ mod tests {
     fn should_not_panic_if_str_contains_value() {
         let value = "Hello";
         assert_that(&value).contains(&"l");
+    }
+
+    #[test]
+    fn should_not_panic_if_str_does_not_contains_value() {
+        let value = "Hello";
+        assert_that(&value).does_not_contain(&"x");
+    }
+
+    #[test]
+    #[should_panic(
+        expected = "\n\texpected: string not containing <\"l\">\n\t but was: <\"Hello\">"
+    )]
+    fn should_panic_if_str_contains_value() {
+        let value = "Hello";
+        assert_that(&value).does_not_contain(&"l");
     }
 
     #[test]
@@ -283,5 +350,4 @@ mod tests {
         let value = "Hello".to_owned();
         assert_that(&value).is_empty();
     }
-
 }

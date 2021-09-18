@@ -1,14 +1,15 @@
 use super::{AssertionFailure, Spec};
 
 use std::borrow::Borrow;
-use std::fmt::Debug;
 use std::cmp::PartialOrd;
+use std::fmt::Debug;
 
 #[cfg(feature = "num")]
 use num::Float;
 
 pub trait OrderedAssertions<T>
-    where T: Debug + PartialOrd
+where
+    T: Debug + PartialOrd,
 {
     fn is_less_than<E: Borrow<T>>(&mut self, other: E);
     fn is_less_than_or_equal_to<E: Borrow<T>>(&mut self, other: E);
@@ -17,12 +18,14 @@ pub trait OrderedAssertions<T>
 }
 
 impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
-    where T: Debug + PartialOrd
+where
+    T: Debug + PartialOrd,
 {
     /// Asserts that the subject is less than the expected value. The subject type must
     /// implement `PartialOrd`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&1).is_less_than(&2);
     /// ```
     fn is_less_than<E: Borrow<T>>(&mut self, other: E) {
@@ -40,7 +43,8 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
     /// Asserts that the subject is less than or equal to the expected value. The subject type
     /// must implement `PartialOrd`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&2).is_less_than_or_equal_to(&2);
     /// ```
     fn is_less_than_or_equal_to<E: Borrow<T>>(&mut self, other: E) {
@@ -49,7 +53,10 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
 
         if subject > borrowed_other {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("value less than or equal to <{:?}>", borrowed_other))
+                .with_expected(format!(
+                    "value less than or equal to <{:?}>",
+                    borrowed_other
+                ))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -58,7 +65,8 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
     /// Asserts that the subject is greater than the expected value. The subject type must
     /// implement `PartialOrd`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&2).is_greater_than(&1);
     /// ```
     fn is_greater_than<E: Borrow<T>>(&mut self, other: E) {
@@ -76,7 +84,8 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
     /// Asserts that the subject is greater than or equal to the expected value. The subject type
     /// must implement `PartialOrd`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&2).is_greater_than_or_equal_to(&1);
     /// ```
     fn is_greater_than_or_equal_to<E: Borrow<T>>(&mut self, other: E) {
@@ -85,7 +94,10 @@ impl<'s, T> OrderedAssertions<T> for Spec<'s, T>
 
         if subject < borrowed_other {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("value greater than or equal to <{:?}>", borrowed_other))
+                .with_expected(format!(
+                    "value greater than or equal to <{:?}>",
+                    borrowed_other
+                ))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -102,7 +114,8 @@ impl<'s, T: Float + Debug> FloatAssertions<T> for Spec<'s, T> {
     /// Asserts that the subject is close to the expected value by the specified tolerance.
     /// The subject type must implement `Float` and `Debug`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&2.0f64).is_close_to(2.0f64, 0.01f64);
     /// ```
     fn is_close_to<E: Borrow<T>, O: Borrow<T>>(&mut self, expected: E, tolerance: O) {
@@ -114,9 +127,10 @@ impl<'s, T: Float + Debug> FloatAssertions<T> for Spec<'s, T> {
 
         if !subject.is_finite() || difference > borrowed_tolerance.abs() {
             AssertionFailure::from_spec(self)
-                .with_expected(format!("float close to <{:?}> (tolerance of <{:?}>)",
-                                       borrowed_expected,
-                                       borrowed_tolerance))
+                .with_expected(format!(
+                    "float close to <{:?}> (tolerance of <{:?}>)",
+                    borrowed_expected, borrowed_tolerance
+                ))
                 .with_actual(format!("<{:?}>", subject))
                 .fail();
         }
@@ -223,29 +237,29 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "\n\texpected: float close to <1> (tolerance of <0.01>)\
-                   \n\t but was: <2>")]
+    #[should_panic(expected = "	expected: float close to <1.0> (tolerance of <0.01>)
+	 but was: <2.0>")]
     fn should_panic_if_float_is_not_close_to() {
         assert_that(&2.0f64).is_close_to(1.0f64, 0.01f64);
     }
 
     #[test]
-    #[should_panic(expected = "\n\texpected: float close to <1> (tolerance of <0.01>)\
-                   \n\t but was: <NaN>")]
+    #[should_panic(expected = "	expected: float close to <1.0> (tolerance of <0.01>)
+	 but was: <NaN>")]
     fn should_panic_if_float_is_nan() {
         assert_that(&Float::nan()).is_close_to(1.0f64, 0.01f64);
     }
 
     #[test]
-    #[should_panic(expected = "\n\texpected: float close to <1> (tolerance of <0.01>)\
-                   \n\t but was: <inf>")]
+    #[should_panic(expected = "	expected: float close to <1.0> (tolerance of <0.01>)
+	 but was: <inf>")]
     fn should_panic_if_float_is_infinity() {
         assert_that(&Float::infinity()).is_close_to(1.0f64, 0.01f64);
     }
 
     #[test]
-    #[should_panic(expected = "\n\texpected: float close to <1> (tolerance of <0.01>)\
-                   \n\t but was: <-inf>")]
+    #[should_panic(expected = "	expected: float close to <1.0> (tolerance of <0.01>)
+	 but was: <-inf>")]
     fn should_panic_if_float_is_negative_infinity() {
         assert_that(&Float::neg_infinity()).is_close_to(1.0f64, 0.01f64);
     }

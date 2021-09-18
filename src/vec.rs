@@ -9,7 +9,8 @@ impl<'s, T> VecAssertions for Spec<'s, Vec<T>> {
     /// Asserts that the length of the subject vector is equal to the provided length. The subject
     /// type must be of `Vec`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// assert_that(&vec![1, 2, 3, 4]).has_length(4);
     /// ```
     fn has_length(&mut self, expected: usize) {
@@ -24,7 +25,8 @@ impl<'s, T> VecAssertions for Spec<'s, Vec<T>> {
 
     /// Asserts that the subject vector is empty. The subject type must be of `Vec`.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
     /// let test_vec: Vec<u8> = vec![];
     /// assert_that(&test_vec).is_empty();
     /// ```
@@ -70,5 +72,4 @@ mod tests {
     fn should_panic_if_vec_was_expected_to_be_empty_and_is_not() {
         assert_that(&vec![1]).is_empty();
     }
-
 }

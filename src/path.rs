@@ -11,11 +11,10 @@ pub trait PathAssertions {
     fn has_file_name<'r, E: Borrow<&'r str>>(&mut self, expected_file_name: E);
 }
 
-
 impl<'s> PathAssertions for Spec<'s, &'s Path> {
     /// Asserts that the subject `Path` refers to an existing location.
     ///
-    /// ```rust,ignore
+    /// ```rust, ignore
     /// assert_that(&Path::new("/tmp/file")).exists();
     /// ```
     fn exists(&mut self) {
@@ -24,7 +23,9 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
 
     /// Asserts that the subject `Path` does not refer to an existing location.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
+    /// # use std::path::Path;
     /// assert_that(&Path::new("/tmp/file")).does_not_exist();
     /// ```
     fn does_not_exist(&mut self) {
@@ -33,7 +34,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
 
     /// Asserts that the subject `Path` refers to an existing file.
     ///
-    /// ```rust,ignore
+    /// ```rust, ignore
     /// assert_that(&Path::new("/tmp/file")).is_a_file();
     /// ```
     fn is_a_file(&mut self) {
@@ -42,7 +43,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
 
     /// Asserts that the subject `Path` refers to an existing directory.
     ///
-    /// ```rust,ignore
+    /// ```rust, ignore
     /// assert_that(&Path::new("/tmp/dir/")).is_a_directory();
     /// ```
     fn is_a_directory(&mut self) {
@@ -51,7 +52,9 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
 
     /// Asserts that the subject `Path` has the expected file name.
     ///
-    /// ```rust,ignore
+    /// ```rust
+    /// # use spectral::prelude::*;
+    /// # use std::path::Path;
     /// assert_that(&Path::new("/tmp/file")).has_file_name(&"file");
     /// ```
     fn has_file_name<'r, E: Borrow<&'r str>>(&mut self, expected_file_name: E) {
@@ -62,7 +65,7 @@ impl<'s> PathAssertions for Spec<'s, &'s Path> {
 impl<'s> PathAssertions for Spec<'s, PathBuf> {
     /// Asserts that the subject `PathBuf` refers to an existing location.
     ///
-    /// ```rust,ignore
+    /// ```rust, ignore
     /// assert_that(&PathBuf::from("/tmp/file")).exists();
     /// ```
     fn exists(&mut self) {
@@ -71,7 +74,7 @@ impl<'s> PathAssertions for Spec<'s, PathBuf> {
 
     /// Asserts that the subject `PathBuf` does not refer to an existing location.
     ///
-    /// ```rust,ignore
+    /// ```rust, ignore
     /// assert_that(&PathBuf::from("/tmp/file")).does_not_exist();
     /// ```
     fn does_not_exist(&mut self) {
@@ -80,7 +83,7 @@ impl<'s> PathAssertions for Spec<'s, PathBuf> {
 
     /// Asserts that the subject `PathBuf` refers to an existing file.
     ///
-    /// ```rust,ignore
+    /// ```rust, ignore
     /// assert_that(&PathBuf::from("/tmp/file")).is_a_file();
     /// ```
     fn is_a_file(&mut self) {
@@ -89,7 +92,7 @@ impl<'s> PathAssertions for Spec<'s, PathBuf> {
 
     /// Asserts that the subject `PathBuf` refers to an existing directory.
     ///
-    /// ```rust,ignore
+    /// ```rust, ignore
     /// assert_that(&PathBuf::from("/tmp/dir/")).is_a_directory();
     /// ```
     fn is_a_directory(&mut self) {
@@ -97,8 +100,7 @@ impl<'s> PathAssertions for Spec<'s, PathBuf> {
     }
 
     /// Asserts that the subject `PathBuf` has the expected file name.
-    ///
-    /// ```rust,ignore
+    /// ```rust, ignore
     /// assert_that(&PathBuf::from("/tmp/file")).has_file_name(&"file");
     /// ```
     fn has_file_name<'r, E: Borrow<&'r str>>(&mut self, expected_file_name: E) {
@@ -142,26 +144,29 @@ fn is_a_directory<'s, S: DescriptiveSpec<'s>>(subject: &Path, spec: &'s S) {
     }
 }
 
-
-fn has_file_name<'s, S: DescriptiveSpec<'s>>(subject: &Path,
-                                             expected_file_name: &str,
-                                             spec: &'s S) {
+fn has_file_name<'s, S: DescriptiveSpec<'s>>(
+    subject: &Path,
+    expected_file_name: &str,
+    spec: &'s S,
+) {
     let subject_file_name = match subject.file_name() {
-        Some(os_string) => {
-            match os_string.to_str() {
-                Some(val) => val,
-                None => {
-                    fail_from_file_name(spec,
-                                        expected_file_name,
-                                        format!("an invalid UTF-8 file name"));
-                    unreachable!();
-                }
+        Some(os_string) => match os_string.to_str() {
+            Some(val) => val,
+            None => {
+                fail_from_file_name(
+                    spec,
+                    expected_file_name,
+                    format!("an invalid UTF-8 file name"),
+                );
+                unreachable!();
             }
-        }
+        },
         None => {
-            fail_from_file_name(spec,
-                                expected_file_name,
-                                format!("a non-resolvable path <{:?}>", subject));
+            fail_from_file_name(
+                spec,
+                expected_file_name,
+                format!("a non-resolvable path <{:?}>", subject),
+            );
             unreachable!();
         }
     };
