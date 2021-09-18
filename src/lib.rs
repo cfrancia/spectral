@@ -1,6 +1,6 @@
 //! Fluent test assertions in Rust
 //!
-//! Spectral is a testing framework designed to make your assertions read like plain English.
+//! Speculoos is a testing framework designed to make your assertions read like plain English.
 //! This allows you to more easily expose the intent of your test, rather than having it shrouded by
 //! assertions which work, but are opaque on their meaning.
 //!
@@ -140,7 +140,7 @@
 //! message tells us enough information to work that out as well.
 //!
 //! Now, this was just a simple example, and there's a number of features not demonstrated, but
-//! hopefully it's enough to start you off with writing assertions in your tests using Spectral.
+//! hopefully it's enough to start you off with writing assertions in your tests using Speculoos.
 
 use std::borrow::Borrow;
 use std::cmp::PartialEq;

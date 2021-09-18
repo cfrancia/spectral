@@ -32,7 +32,7 @@ use speculoos::prelude::*;
 
 ## Overview
 
-Spectral allows you to write your assertions in a fluent manner by seperating out what you are testing with, what you are testing against and how you are asserting.
+Speculoos allows you to write your assertions in a fluent manner by seperating out what you are testing with, what you are testing against and how you are asserting.
 
 ### Simple asserts
 
