@@ -46,7 +46,7 @@ where
                 AssertionFailure::from_spec(self)
                     .with_expected(format!("option<{:?}>", borrowed_expected_value))
                     .with_actual("option[none]".to_string())
-                                     .fail();
+                    .fail();
             }
         };
     }
